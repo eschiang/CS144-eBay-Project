@@ -15,9 +15,9 @@ FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"';
 
 -- Query for all the actors in 'Die Another Day' --
 
-SELECT `name`
+SELECT `Name`
 FROM `Actors`
-WHERE `movie` = 'Die Another Day';
+WHERE `Movie` = 'Die Another Day';
 
 -- Drop the Actors table --
 
