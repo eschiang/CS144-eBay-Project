@@ -1,0 +1,29 @@
+LOAD DATA LOCAL INFILE './User.csv' 
+  INTO TABLE User
+  FIELDS TERMINATED BY ','
+    OPTIONALLY ENCLOSED BY '"'
+        ESCAPED BY '"';
+    
+LOAD DATA LOCAL INFILE './Category.csv' 
+  INTO TABLE Category
+  FIELDS TERMINATED BY ','
+    OPTIONALLY ENCLOSED BY '"'
+        ESCAPED BY '"';
+        
+LOAD DATA LOCAL INFILE './Item.csv' 
+  INTO TABLE Item
+  FIELDS TERMINATED BY ','
+    OPTIONALLY ENCLOSED BY '"'
+        ESCAPED BY '"';
+        
+LOAD DATA LOCAL INFILE './Item_Category.csv' 
+  INTO TABLE Item_Category
+  FIELDS TERMINATED BY ','
+    OPTIONALLY ENCLOSED BY '"'
+        ESCAPED BY '"';
+        
+LOAD DATA LOCAL INFILE './Bid.csv' 
+  INTO TABLE Bid
+  FIELDS TERMINATED BY ','
+    OPTIONALLY ENCLOSED BY '"'
+        ESCAPED BY '"';
