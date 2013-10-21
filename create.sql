@@ -25,8 +25,8 @@ CREATE TABLE Item_Category (
 ItemID INTEGER NOT NULL,
 CategoryID INTEGER,
 PRIMARY KEY(ItemID, CategoryID),
- FOREIGN KEY (ItemID) REFERENCES Item(ItemID),
-        FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID)
+FOREIGN KEY (ItemID) REFERENCES Item(ItemID),
+FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID)
 );
 
 -- Bid Table --
@@ -36,8 +36,9 @@ ItemID INTEGER,
 UserID INTEGER,
 Amount DECIMAL(8,2),
 Time TIMESTAMP,
-        FOREIGN KEY (ItemID) REFERENCES Item(ItemID),
-        FOREIGN KEY (UserID) REFERENCES User(UserID));
+FOREIGN KEY (ItemID) REFERENCES Item(ItemID),
+FOREIGN KEY (UserID) REFERENCES User(UserID)
+);
 
 
 
@@ -48,8 +49,4 @@ Name VARCHAR(50),
 Rating INTEGER,
 Location VARCHAR(50),
 Country VARCHAR(30)
-
-
-
-
 );
