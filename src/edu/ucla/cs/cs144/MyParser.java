@@ -45,7 +45,9 @@ class MyParser {
     
     static final String columnSeparator = "|*|";
     static DocumentBuilder builder;
-    
+    static Set<String> categories = new HashSet<String>();
+
+
     static final String[] typeName = {
 	"none",
 	"Element",
@@ -182,6 +184,68 @@ class MyParser {
         
         /* Fill in code here (you will probably need to write auxiliary
             methods). */
+    
+        // Begin by getting all the root element of the file and an array of 
+        // the items it contains.  
+        Element root = doc.getDocumentElement();
+        Element[] items = getElementsByTagNameNR(root, "Item");
+
+        // Iterate through the items 
+        int itemCount = items.length;
+        for(int i=0; i<itemCount; i++)
+        {
+            // Get the element's ItemID
+            String ItemID = items[i].getAttribute("ItemID");
+
+            // Get the element's name
+            String name = getElementTextByTagNameNR(items[i], "Name");
+            
+            // Get the categories for the item
+            Element[] categoriesElements = getElementsByTagNameNR(items[i], "Category");
+
+            // Iterate through the categories adding them to the categories set if necessary
+            int categoryCount = categoriesElements.length;
+            for(int j=0; j<categoryCount; j++)
+            {
+                categories.add(getElementText(categoriesElements[j]));
+            }
+
+            Iterator iter = categories.iterator();
+            while(iter.hasNext())
+            {
+                System.out.println(iter.next());                
+            }
+
+
+            // Get current Bid
+            String currenly = getElementTextByTagNameNR(items[i], "Currenly");
+
+            // Get the number of bids
+            String numberOfBids = getElementTextByTagNameNR(items[i], "Number_of_Bids");
+
+            // Get Bids
+            Element BidsParent = getElementByTagNameNR(items[i], "Bids");
+
+            // Get the list of bids
+            Element[] Bids = getElementsByTagNameNR(items[i], "Bid");
+
+            // Iterate through the bids 
+            int bidCount = Bids.length;
+            for(int j=0; j<bidCount; j++)
+            {
+                // Get the time
+
+                // Get the amount
+
+                // Get the bidder element
+
+                // Get bidder's info
+
+            }
+
+            // Get the seller's info
+
+        }
         
         
         
