@@ -28,6 +28,8 @@ package edu.ucla.cs.cs144;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.Map.Entry;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -42,6 +44,96 @@ import org.xml.sax.ErrorHandler;
 
 
 class MyParser {
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static class Category {
+        int categoryID;
+        String name;
+      
+        public Category(int categoryID, String name) {
+                categoryID = categoryID;
+                name = name;
+        }
+
+   
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    public static class ItemCategory {
+        String itemID;
+        int categoryID;
+
+        /**
+         * @param itemID
+         * @param categoryID
+         */
+        public ItemCategory(String itemID, int categoryID) {
+                super();
+                itemID = itemID;
+                categoryID = categoryID;
+        }}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     public static class User 
+     { 
+    String u_name;
+    String u_location;
+    String u_rating;
+    String u_country;
+
+    User(String uname, String ulocation, String urating, String ucountry)
+     { 
+      u_name = uname; 
+      u_location=ulocation;
+      u_rating=urating;
+      u_country=ucountry;
+    } 
+  }
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  public static class Bid { 
+    String b_item;
+    String b_userid;
+    String b_amount;
+    String b_time; // handle time conversion
+
+    Bid(String bitem, String buserid, String bamount, String btime)
+    { 
+      b_item = bitem; 
+      b_userid=buserid;
+      b_amount=bamount;
+      b_time=btime; // handle time conversion
+    } 
+  }
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   public static class Item { 
+    String i_name;
+    String i_description;
+    String i_started;
+    String i_ends;
+    String i_currently;
+    String i_buyprice;
+    String i_numberofbids;
+    String i_seller;
+    String i_id;
+
+
+    Item(String iid,String iname, String idescription, String istarted, String iends, String icurrently, String ibuyprice, String inumberofbids, String iseller)
+    { 
+    i_id=iid;  
+     i_name = iname; 
+     i_description=idescription;
+     i_started=istarted;
+     i_ends=iends;
+     i_currently = icurrently; 
+     i_buyprice=ibuyprice;
+     i_numberofbids=inumberofbids;
+      i_seller=iseller;
+    } 
+  }
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    static Map<String, User> users = new HashMap<String, User>();
+    static Map<String, Bid> bids = new HashMap<String, Bid>();
+    static Map<String, Item> itemsmap = new HashMap<String, Item>();
+    static Map<String, Category> categoryMap =new HashMap<String, Category>(); 
+    static Map<String, ItemCategory> itemcategories =new HashMap<String, ItemCategory>(); 
+
     
     static final String columnSeparator = "|*|";
     static DocumentBuilder builder;
@@ -49,19 +141,19 @@ class MyParser {
 
 
     static final String[] typeName = {
-	"none",
-	"Element",
-	"Attr",
-	"Text",
-	"CDATA",
-	"EntityRef",
-	"Entity",
-	"ProcInstr",
-	"Comment",
-	"Document",
-	"DocType",
-	"DocFragment",
-	"Notation",
+    "none",
+    "Element",
+    "Attr",
+    "Text",
+    "CDATA",
+    "EntityRef",
+    "Entity",
+    "ProcInstr",
+    "Comment",
+    "Document",
+    "DocType",
+    "DocFragment",
+    "Notation",
     };
     
     static class MyErrorHandler implements ErrorHandler {
@@ -196,54 +288,127 @@ class MyParser {
         {
             // Get the element's ItemID
             String ItemID = items[i].getAttribute("ItemID");
-
             // Get the element's name
             String name = getElementTextByTagNameNR(items[i], "Name");
-            
             // Get the categories for the item
             Element[] categoriesElements = getElementsByTagNameNR(items[i], "Category");
+            // Get the location for the item
+            String s_location = getElementTextByTagNameNR(items[i], "Location");
+            // Get the country for the item
+            String s_country = getElementTextByTagNameNR(items[i], "Country");
+            // Get the start bid time for the item
+            String s_time = getElementTextByTagNameNR(items[i], "Started");
+            // Get the end bit time for the item
+            String e_time = getElementTextByTagNameNR(items[i], "Ends");
+            // Get the description for the item
+            String description = getElementTextByTagNameNR(items[i], "Description");
+            if (description.length() > 4000)
+                    description = description.substring(0, 4000);
+            // Get the first bid for the item
+            String minimumBid = strip(getElementTextByTagNameNR(items[0], "First_Bid"));
+            // Get the buy now for the item
+            String buy_now = strip(getElementTextByTagNameNR(items[0], "Buy_Price"));
+            if (buy_now.isEmpty())
+                    buy_now = "0.00";
+            
+            // Get the seller
+            Element seller = getElementByTagNameNR(items[0], "Seller");
+            // Get the seller's uid
+            String u_id = seller.getAttribute("UserID");
+            // Get the seller's rating
+            String s_rating = seller.getAttribute("Rating");
+            
+            
+    
+          
+            ////Making the User object and putting it into the usermap with seller id being key//////
+            User sellerObject = new User(u_id, s_location, s_country, s_rating);//User object made
+            users.put(u_id, sellerObject);//User Object added to map with user id being the key
 
-            // Iterate through the categories adding them to the categories set if necessary
+            //Getting the length of the categories
             int categoryCount = categoriesElements.length;
-            for(int j=0; j<categoryCount; j++)
-            {
-                categories.add(getElementText(categoriesElements[j]));
-            }
+            // Iterate through the categories adding them to the categories set if necessary
+            /////Set not needed any more. Cehck out how i do the categories with a map//////
 
-            Iterator iter = categories.iterator();
-            while(iter.hasNext())
+           // for(int j=0; j<categoryCount; j++)
+            //{
+             //   categories.add(getElementText(categoriesElements[j]));
+           // }
+            //Iterator iter = categories.iterator();
+        /*    while(iter.hasNext())
             {
                 System.out.println(iter.next());                
+            }*/
+            ////////////////////////////////////////////////////////////////////////
+            
+   //////THIS CODE PUTS THE CATEGORIES INTO A MAP WITH A KEY(NAME) AND ASSIGNS IT A VALUE(INDEX)///////
+
+            for (int ind = 0; ind < categoryCount; ind++)
+            {
+                    
+                    String categoryName =getElementText(categoriesElements[ind]);
+                    int categoryID;
+                    
+                    // Create Category object and add to map
+                    if (categoryMap.containsKey(categoryName))
+                    {
+                            Category categoryObject = categoryMap.get(categoryName);
+                            categoryID = categoryObject.categoryID;
+                    }
+                    else
+                    {
+                            categoryID = categoryMap.size();
+                            Category categoryObject = new Category(categoryID, categoryName);
+                            categoryMap.put(categoryName, categoryObject);
+                    }
+                    //////////Making the itemcategory obejct and putting the itemcategories map with item id being the key///////////
+                    ItemCategory item_cat = new ItemCategory(ItemID, categoryID);
+                    itemcategories.put(ItemID,item_cat);
+
             }
 
-
             // Get current Bid
-            String currenly = getElementTextByTagNameNR(items[i], "Currenly");
-
+            String currently = getElementTextByTagNameNR(items[i], "Currently");
+ 
             // Get the number of bids
             String numberOfBids = getElementTextByTagNameNR(items[i], "Number_of_Bids");
-
-            // Get Bids
+            ////Making the Item object and putting it into the item map with itemId being key//////
+            Item i_object = new Item(ItemID, name, description, s_time, e_time,currently, buy_now, numberOfBids,u_id ); 
+            itemsmap.put(ItemID,i_object);
             Element BidsParent = getElementByTagNameNR(items[i], "Bids");
 
             // Get the list of bids
             Element[] Bids = getElementsByTagNameNR(items[i], "Bid");
 
             // Iterate through the bids 
+          
             int bidCount = Bids.length;
             for(int j=0; j<bidCount; j++)
             {
-                // Get the time
-
-                // Get the amount
-
-                // Get the bidder element
-
-                // Get bidder's info
-
+                
+                  //Parsing the bid
+                  Element bid = Bids[j];
+                  //GEtting the bid time
+                  String b_time = getElementTextByTagNameNR(bid, "Time");
+                  //Getting the bid amount
+                  String b_amount = strip(getElementTextByTagNameNR(bid, "Amount"));
+                  
+                  //Inner parse
+                  Element bidder = getElementByTagNameNR(bid, "Bidder");
+                  //Get the uid of the bidder
+                  String b_ID =  bidder.getAttribute("UserID");
+                  //Get the rating of the bidder
+                  String b_Rating = bidder.getAttribute("Rating");
+                  //Get the bidder's location
+                  String b_Location = getElementTextByTagNameNR(bidder, "Location");
+                  //Get the bidders country
+                  String b_country = getElementTextByTagNameNR(bidder, "Country");
+                  ///////////////////DATA BEING ADDED TO THE BIDS MAP///////////
+                  Bid b_object = new Bid(ItemID, b_ID, b_amount, b_time);
+                  bids.put(ItemID,b_object);
+   
             }
 
-            // Get the seller's info
 
         }
         
@@ -252,6 +417,24 @@ class MyParser {
         /**************************************************************/
         
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     public static void main (String[] args) {
         if (args.length == 0) {
@@ -280,6 +463,15 @@ class MyParser {
         for (int i = 0; i < args.length; i++) {
             File currentFile = new File(args[i]);
             processFile(currentFile);
+        }
+ //       "Test : Josh you can play around with the other maps to make sure we go everything
+        System.out.println("Test : Josh you can play around with the other maps to make sure we got everything");
+        for (Map.Entry<String,Item> entry : itemsmap.entrySet()) {
+            String key = entry.getKey();
+            Item thing = entry.getValue();
+            System.out.print(key + thing.i_description);
+            System.out.println();
+
         }
     }
 }
