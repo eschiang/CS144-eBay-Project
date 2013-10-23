@@ -8,15 +8,18 @@ Email: meetbhagdev@ucla.edu
 
 Part 2
 ---------
-Relations in proposed schema:
+1) Relations in proposed schema:
 
-Item(ItemID, Name, Description, Started, Ends, Currently, Buy_Price, First_Bid
-     Number_of_bids, Seller)
-Category(CategoryID, Category)
-Item_Category(ItemID, CategoryID)
-Bid(BidID, ItemID, UserID, Amount, Time)
-User(UserID, Name, Rating, Location, Country)
+	Item(ItemID, Name, Description, Started, Ends, Currently, Buy_Price, First_Bid, Number_of_bids, Seller) Keys: ItemID
 
-The only functional dependencies in each relation are for keys.
+	Category(CategoryID, Category) Keys: CategoryID
 
-This schema should be in BCNF.
+	Item_Category(ItemID, CategoryID) Keys: (ItemID, CategoryID)
+
+	Bid(UserID,  Time, ItemID, Amount) Keys: (UserID, Time)
+
+	User(UserID, Rating, Location, Country) Keys: UserID
+
+2) The only functional dependencies in each relation are for keys.
+
+3) This schema should be in BCNF because all the functional dependencies for 	each table contains a key in the left hand side.
