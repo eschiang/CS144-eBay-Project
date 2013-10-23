@@ -41,6 +41,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
+import java.lang.Object;
 
 /**
  * MyParser
@@ -103,14 +104,14 @@ class MyParser {
         String b_item;
         String b_userid;
         String b_amount;
-        String b_time; // handle time conversion
+        String b_time; 
 
         Bid(String itemID, String userID, String amount, String time)
         { 
             b_item = itemID; 
             b_userid = userID;
             b_amount = amount;
-            b_time = time; // handle time conversion
+            b_time = time; 
         } 
     }
 
@@ -323,7 +324,7 @@ class MyParser {
         for(int i=0; i<itemCount; i++) {
             // Get information about the item that belongs in itemMap
             String itemID = items[i].getAttribute("ItemID");
-            String name = getElementTextByTagNameNR(items[i], "Name");
+            String name =  getElementTextByTagNameNR(items[i], "Name");
             String start_time = convertDate(getElementTextByTagNameNR(items[i], "Started"));
             String end_time = convertDate(getElementTextByTagNameNR(items[i], "Ends"));
             String description = getElementTextByTagNameNR(items[i], "Description");
@@ -370,14 +371,15 @@ class MyParser {
 
             // Get the list of bids
             Element BidsParent = getElementByTagNameNR(items[i], "Bids");
-            Element[] Bids = getElementsByTagNameNR(items[i], "Bid");
+            Element[] Bids = getElementsByTagNameNR(BidsParent, "Bid");
 
             // Iterate through the bids and add bidder and bid to respective maps if necessary
             int bidCount = Bids.length;
             for (int j=0; j<bidCount; j++) {
                 // Get info about the bid for bidMap
                 Element bid = Bids[j];
-                String b_time = getElementTextByTagNameNR(bid, "Time");
+                String b_time = convertDate(getElementTextByTagNameNR(bid, "Time"));
+
                 String b_amount = strip(getElementTextByTagNameNR(bid, "Amount"));
 
                 // Get info about the bidder to add to userMap
@@ -388,6 +390,8 @@ class MyParser {
                 String b_country = getElementTextByTagNameNR(bidder, "Country");
 
                 // Add the bid to the bidMap
+              
+
                 Bid bid_object = new Bid(itemID, b_userid, b_amount, b_time);
                 bidMap.put(itemID, bid_object);
 
@@ -446,13 +450,175 @@ class MyParser {
             File currentFile = new File(args[i]);
             processFile(currentFile);
         }
+          
+                try
+                {
+                FileWriter item = new FileWriter("Item.csv");
+                BufferedWriter itemwriter= new BufferedWriter(item);
+             
+                 for (Map.Entry<String, Item> entry : itemMap.entrySet()) {
+                    String key = entry.getKey();
+                    Item thing = entry.getValue();
 
+                       String iid = thing.i_id;
+                       String iname=thing.i_name;
+                       String idescription=thing.i_description;
+                       String istarted=thing.i_started;
+                       String iends=thing.i_ends;
+                       String icurrently=thing.i_currently;
+                       String ifirstbid=thing.i_firstbid;
+                       String ibuyprice =thing.i_buyprice;
+                       String inumberofbids = thing.i_numberofbids;
+                       String iseller=thing.i_seller;
+                       
+                       String entrycsv = String.format("%s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s \n", 
+                                iid,
+                                iname,
+                                idescription,
+                                istarted,
+                                iends,
+                                icurrently,
+                                ifirstbid,
+                                ibuyprice,
+                                inumberofbids,
+                                iseller);
+                    itemwriter.write(entrycsv); 
+                }
+                itemwriter.close();
+                item.close();
+            }
+                catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+                try
+                {
+                FileWriter user = new FileWriter("User.csv");
+                BufferedWriter userwriter= new BufferedWriter(user);
+                 for (Map.Entry<String, User> entry : userMap.entrySet()) {
+                    String key = entry.getKey();
+                    User thing = entry.getValue();
+
+                    String uname = thing.u_name;
+                    String ulocation = thing.u_location;
+                    String urating = thing.u_rating;
+                    String ucountry = thing.u_country;
+                       
+                       String entrycsv = String.format("%s |*| %s |*| %s |*| %s \n", 
+                                uname,
+                                ulocation,
+                                urating,
+                                ucountry);
+                    userwriter.write(entrycsv); 
+                }
+                userwriter.close();
+                user.close();
+            }
+                catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+                
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Testing that all maps have expected data
-        for (Map.Entry<String, Item> entry : itemMap.entrySet()) {
-            String key = entry.getKey();
-            Item thing = entry.getValue();
-            System.out.print(key + thing.i_started);
-            System.out.println();
-        }
+                 try
+                {
+                FileWriter category = new FileWriter("Category.csv");
+                BufferedWriter categorywriter= new BufferedWriter(category);
+                 for (Map.Entry<String, Category> entry : categoryMap.entrySet()) {
+                    String key = entry.getKey();
+                    Category thing = entry.getValue();
+
+                  String ccategoryID = String.valueOf(thing.c_categoryID);
+                  String cname = thing.c_name;
+                       
+                       String entrycsv = String.format("%s |*| %s \n", 
+                                ccategoryID,
+                                cname);
+                    categorywriter.write(entrycsv); 
+                }
+                categorywriter.close();
+                category.close();
+            }
+                catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+                  try
+                {
+                FileWriter itemcategory = new FileWriter("ItemCategory.csv");
+                BufferedWriter itemcategorywriter= new BufferedWriter(itemcategory);
+                 for (Map.Entry<String, ItemCategory> entry : itemcategoriesMap.entrySet()) {
+                    String key = entry.getKey();
+                    ItemCategory thing = entry.getValue();
+
+                  String icitemID =thing.ic_itemID;
+                  String iccategoryID = String.valueOf(thing.ic_categoryID); ;
+                       
+                       String entrycsv = String.format("%s |*| %s \n", 
+                                iccategoryID,
+                                icitemID);
+                    itemcategorywriter.write(entrycsv); 
+                }
+                itemcategorywriter.close();
+                itemcategory.close();
+            }
+                catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+                try
+                {
+                FileWriter itemcategory = new FileWriter("ItemCategory.csv");
+                BufferedWriter itemcategorywriter= new BufferedWriter(itemcategory);
+                 for (Map.Entry<String, ItemCategory> entry : itemcategoriesMap.entrySet()) {
+                    String key = entry.getKey();
+                    ItemCategory thing = entry.getValue();
+
+                  String icitemID =thing.ic_itemID;
+                  String iccategoryID = String.valueOf(thing.ic_categoryID); ;
+                       
+                       String entrycsv = String.format("%s |*| %s \n", 
+                                iccategoryID,
+                                icitemID);
+                    itemcategorywriter.write(entrycsv); 
+                }
+                itemcategorywriter.close();
+                itemcategory.close();
+            }
+                catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+                 try
+                {
+                FileWriter bids = new FileWriter("Bid.csv");
+                BufferedWriter bidswriter= new BufferedWriter(bids);
+                 for (Map.Entry<String, Bid> entry : bidMap.entrySet()) {
+                    String key = entry.getKey();
+                    Bid thing = entry.getValue();
+
+                    String bitem = thing.b_item;
+                    String buserid = thing.b_userid;
+                    String bamount = thing.b_amount;
+                    String btime = thing.b_time;
+                       
+                       String entrycsv = String.format("%s |*| %s |*| %s |*| %s\n", 
+                                
+                                buserid,
+                                btime,
+                                bitem,
+                                bamount
+                                );
+                    bidswriter.write(entrycsv); 
+                }
+                bidswriter.close();
+                bids.close();
+            }
+                catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+
     }
 }
