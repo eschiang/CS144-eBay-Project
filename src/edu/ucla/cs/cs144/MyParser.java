@@ -101,17 +101,19 @@ class MyParser {
      */
     public static class Bid
     { 
-        String b_item;
         String b_userid;
-        String b_amount;
         String b_time; 
+        String b_item;
+        String b_amount;
 
-        Bid(String itemID, String userID, String amount, String time)
+
+        Bid(String userID, String time, String itemID, String amount)
         { 
-            b_item = itemID; 
+          
             b_userid = userID;
-            b_amount = amount;
             b_time = time; 
+            b_item = itemID; 
+            b_amount = amount;
         } 
     }
 
@@ -389,8 +391,8 @@ class MyParser {
                 String b_country = getElementTextByTagNameNR(bidder, "Country");
 
                 // Add the bid to the bidMap
-                Bid bid_object = new Bid(itemID, b_userid, b_amount, b_time);
-                bidMap.put(itemID, bid_object);
+                Bid bid_object = new Bid(b_userid, b_time, itemID, b_amount);
+                bidMap.put(b_userid + b_time, bid_object);
 
                 // Add the bidder to the userMap if not present
                 if (!userMap.containsKey(b_userid)) {

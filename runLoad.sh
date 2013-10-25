@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Declare which table is to be used
-TABLE="TEST";
+TABLE="CS144";
 
 # Drop tables in the database with the drop.sql script
 mysql $TABLE < drop.sql
@@ -16,8 +16,7 @@ ant run-all
 # Load data into MySQL
 mysql $TABLE < load.sql
 
-# Run the queries.sql script
-mysql $TABLE < queries.sql
 
 # Delete the files created by the
 rm *.dat
+rm -rf bin
