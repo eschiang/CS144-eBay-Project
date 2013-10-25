@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 # Declare which table is to be used
 TABLE="CS144";
@@ -16,7 +16,6 @@ ant run-all
 # Load data into MySQL
 mysql $TABLE < load.sql
 
-
-# Delete the files created by the
+# Delete the files created by the parser
 rm *.dat
 rm -rf bin
