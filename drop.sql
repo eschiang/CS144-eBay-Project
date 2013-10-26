@@ -1,3 +1,5 @@
+-- drop.sql --
+
 DROP TABLE IF EXISTS `Bid`;
 DROP TABLE IF EXISTS `Item_Category`;
 DROP TABLE IF EXISTS `Item`;

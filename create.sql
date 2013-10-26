@@ -4,8 +4,8 @@
 CREATE TABLE User (
     UserID VARCHAR(75) NOT NULL,
     Rating INTEGER NOT NULL,
-    Location VARCHAR(50),
-    Country VARCHAR(30),
+    Location VARCHAR(50) DEFAULT NULL,
+    Country VARCHAR(30) DEFAULT NULL,
     PRIMARY KEY (UserID)
 ) ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
@@ -17,8 +17,8 @@ CREATE TABLE Item (
 	Started TIMESTAMP NOT NULL,
 	Ends TIMESTAMP NOT NULL,
 	Currently DECIMAL(8,2) NOT NULL,
-	Buy_Price DECIMAL(8,2) NOT NULL,
 	First_Bid DECIMAL(8,2) NOT NULL,
+    Buy_Price DECIMAL(8,2) DEFAULT NULL,
 	Number_of_Bids INTEGER,
 	Seller VARCHAR(75),
 	PRIMARY KEY (ItemID),
@@ -28,7 +28,7 @@ CREATE TABLE Item (
 -- Category Table --
 CREATE TABLE Category (
     CategoryID INTEGER NOT NULL PRIMARY KEY,
-    Category VARCHAR(50) NOT NULL
+    Category VARCHAR(75) NOT NULL
 ) ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 -- Item_Category Table --

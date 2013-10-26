@@ -3,7 +3,9 @@
 LOAD DATA LOCAL INFILE './User.dat' 
     INTO TABLE `User`
     FIELDS TERMINATED BY ' |*| '
-    LINES TERMINATED BY "\n";
+    LINES TERMINATED BY "\n"
+    (UserID, Rating, @location, @country) SET Location = nullif(@location, ''),
+                                            Country = nullif(@country, '');
 
 LOAD DATA LOCAL INFILE './Category.dat' 
     INTO TABLE `Category`
@@ -15,8 +17,9 @@ LOAD DATA LOCAL INFILE './Item.dat'
     FIELDS TERMINATED BY ' |*| '
     LINES TERMINATED BY "\n"
     (ItemID, Name, Description, @started, @ends, Currently, 
-     Buy_Price, First_Bid, Number_of_Bids, Seller) SET Started = STR_TO_DATE(@started, "%Y-%m-%d %H:%i:%s"), 
-                                                       Ends = STR_TO_DATE(@ends, "%Y-%m-%d %H:%i:%s");
+     First_Bid, @buy_price, Number_of_Bids, Seller) SET Started = STR_TO_DATE(@started, "%Y-%m-%d %H:%i:%s"), 
+                                                        Ends = STR_TO_DATE(@ends, "%Y-%m-%d %H:%i:%s"),
+                                                        Buy_Price = nullif(@buy_price, '');
                                             
 LOAD DATA LOCAL INFILE './Item_Category.dat' 
     INTO TABLE `Item_Category`

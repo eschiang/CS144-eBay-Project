@@ -337,9 +337,9 @@ class MyParser {
             // Get current bidding information for the item
             String currently = strip(getElementTextByTagNameNR(items[i], "Currently"));
             String buy_price = strip(getElementTextByTagNameNR(items[i], "Buy_Price"));
-            // Give a buy now price of 0.00 if not supplied.
+            // Give a buy now price of NULL if not supplied.
             if (buy_price.isEmpty())
-                    buy_price = "NULL";
+                buy_price = "";
 
             String first_bid = strip(getElementTextByTagNameNR(items[i], "First_Bid"));
             String number_of_bids = getElementTextByTagNameNR(items[i], "Number_of_Bids");
@@ -388,7 +388,12 @@ class MyParser {
                 String b_userid =  bidder.getAttribute("UserID");
                 String b_rating = bidder.getAttribute("Rating");
                 String b_location = getElementTextByTagNameNR(bidder, "Location");
+                if (b_location.isEmpty())
+                    b_location = "";
+
                 String b_country = getElementTextByTagNameNR(bidder, "Country");
+                if (b_country.isEmpty())
+                    b_country = "";
 
                 // Add the bid to the bidMap
                 Bid bid_object = new Bid(b_userid, b_time, itemID, b_amount);
@@ -409,7 +414,7 @@ class MyParser {
             String s_location = getElementTextByTagNameNR(items[i], "Location");
             String s_country = getElementTextByTagNameNR(items[i], "Country");
           
-            // Add the user to the userMap if not present
+            // Add the user to the userMap if not presentely identifies a user, who can be a bidder or a seller at different times. I think that means a user has one single ID, as opposed to having a pair. I may be wrong but both the seller and the bidder have location and country as subelements. I think t
             if (!userMap.containsKey(s_userid)) {
                 User seller_object = new User(s_userid, s_rating, s_location, s_country);
                 userMap.put(s_userid, seller_object);
