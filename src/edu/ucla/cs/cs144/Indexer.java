@@ -51,6 +51,24 @@ public class Indexer {
     /**
      * Adds an index for a single item.
      */
+      public void indexItemBasicSearch(ResultSet item, String categories) throws IOException, SQLException
+        {
+                IndexWriter writer = getIndexWriter(false);
+        
+                Document doc = new Document();
+        
+                String ItemID = item.getString(Columns.ITEMID);
+                String UserId = item.getString(Columns.NAME);
+                String description = item.getString(Columns.DESCRIPTION);
+        
+                doc.add(new Field(Columns.ITEMID, ItemID, Field.Store.YES, Field.Index.NO));
+                doc.add(new Field(Columns.USERID, UserId, Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field(Columns.CATEGORY, categories, Field.Store.NO, Field.Index.TOKENIZED));
+                doc.add(new Field(Columns.DESCRIPTION, description, Field.Store.NO, Field.Index.TOKENIZED));
+                String fullSearchableText = UserId + " " + categories + " " + description;
+                doc.add(new Field("content", fullSearchableText, Field.Store.NO, Field.Index.TOKENIZED));
+                writer.addDocument(doc);
+        }
     public void indexItem(int id, String name, String description, String categories) {
         System.out.println(id + " " + name + " " + categories);
     }
