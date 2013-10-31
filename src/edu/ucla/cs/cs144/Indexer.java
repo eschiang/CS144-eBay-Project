@@ -12,13 +12,16 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import java.io.IOException;
-
+import edu.ucla.cs.cs144.Columns;
 public class Indexer {
 
     private IndexWriter indexWriter = null;    
 
     /** Creates a new instance of Indexer */
-    public Indexer() {}
+    public Indexer() 
+    {
+
+    }
 
     /**
      * Returns the indexWriter for the class.
@@ -27,7 +30,7 @@ public class Indexer {
     public IndexWriter getIndexWriter(boolean create)  {
         if (indexWriter == null) {
             try {
-                indexWriter = new IndexWriter("index-directory", new StandardAnalyzer(), create); 
+                indexWriter = new IndexWriter(System.getenv("LUCENE_INDEX") + "/EBAY", new StandardAnalyzer(), create); 
             } catch(IOException e) {
                 System.out.println(e);
             } 
@@ -51,25 +54,20 @@ public class Indexer {
     /**
      * Adds an index for a single item.
      */
-      public void indexItemBasicSearch(ResultSet item, String categories) throws IOException, SQLException
-        {
-                IndexWriter writer = getIndexWriter(false);
+     
+    public void indexItem(int id, String name, String description, String categories) throws IOException  {
+         IndexWriter writer = getIndexWriter(false);
         
                 Document doc = new Document();
         
-                String ItemID = item.getString(Columns.ITEMID);
-                String UserId = item.getString(Columns.NAME);
-                String description = item.getString(Columns.DESCRIPTION);
+           
         
-                doc.add(new Field(Columns.ITEMID, ItemID, Field.Store.YES, Field.Index.NO));
-                doc.add(new Field(Columns.USERID, UserId, Field.Store.YES, Field.Index.TOKENIZED));
-                doc.add(new Field(Columns.CATEGORY, categories, Field.Store.NO, Field.Index.TOKENIZED));
-                doc.add(new Field(Columns.DESCRIPTION, description, Field.Store.NO, Field.Index.TOKENIZED));
-                String fullSearchableText = UserId + " " + categories + " " + description;
+                doc.add(new Field("ud", String.valueOf(id), Field.Store.YES, Field.Index.NO));
+                doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field("description", description, Field.Store.NO, Field.Index.TOKENIZED));
+                String fullSearchableText = String.valueOf(id) + " " + categories + " " + description;
                 doc.add(new Field("content", fullSearchableText, Field.Store.NO, Field.Index.TOKENIZED));
                 writer.addDocument(doc);
-        }
-    public void indexItem(int id, String name, String description, String categories) {
         System.out.println(id + " " + name + " " + categories);
     }
  
@@ -77,19 +75,20 @@ public class Indexer {
      * Removes current indexes and rebuilds indexes on items.
      */
     public void rebuildIndexes() throws SQLException {
-
+        try
+        {
         Connection conn = null;
 
         // create a connection to the database to retrieve Items from MySQL
-    	try {
-    	    conn = DbManager.getConnection(true);
-    	} catch (SQLException ex) {
-    	    System.out.println(ex);
-    	}
+        try {
+            conn = DbManager.getConnection(true);
+        } catch (SQLException ex) {
+            System.out.println(ex);
+        }
 
-    	/*
-    	 * Add your code here to retrieve Items using the connection
-    	 * and add corresponding entries to your Lucene inverted indexes.
+        /*
+         * Add your code here to retrieve Items using the connection
+         * and add corresponding entries to your Lucene inverted indexes.
              *
              * You will have to use JDBC API to retrieve MySQL data from Java.
              * Read our tutorial on JDBC if you do not know how to use JDBC.
@@ -103,8 +102,8 @@ public class Indexer {
              * If you create new classes, make sure that
              * the classes become part of "edu.ucla.cs.cs144" package
              * and place your class source files at src/edu/ucla/cs/cs144/.
-    	 * 
-    	 */
+         * 
+         */
 
         // Initialize the index writer to overwrite the indexes.
         getIndexWriter(true);
@@ -114,7 +113,7 @@ public class Indexer {
         Statement stmt = conn.createStatement();
         System.out.println("1");
         String sql = "SELECT Item.ItemID, Item.Name, Item.Description, C.Categories "
-                   + "FROM (SELECT ItemID, group_concat(Category.Category) AS Categories "
+                   + "FROM (SELECT ItemID, group_concat(Category.Category SEPARATOR ' ') AS Categories "
                                + "FROM Item_Category  "
                                + "INNER JOIN Category "
                                + "ON Item_Category.CategoryID = Category.CategoryID "
@@ -136,11 +135,16 @@ public class Indexer {
         closeIndexWriter();
 
         // close the database connection
-    	try {
-    	    conn.close();
-    	} catch (SQLException ex) {
-    	    System.out.println(ex);
-    	}
+        try {
+            conn.close();
+        } catch (SQLException ex) {
+            System.out.println(ex);
+        }
+    }
+    catch(IOException e)
+    {
+        System.out.print("ere");
+    }
     }    
 
     public static void main(String args[]) {
