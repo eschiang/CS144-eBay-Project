@@ -12,7 +12,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import java.io.IOException;
-import edu.ucla.cs.cs144.Columns;
+
 public class Indexer {
 
     private IndexWriter indexWriter = null;    
@@ -30,7 +30,7 @@ public class Indexer {
     public IndexWriter getIndexWriter(boolean create)  {
         if (indexWriter == null) {
             try {
-                indexWriter = new IndexWriter(System.getenv("LUCENE_INDEX") + "/EBAY", new StandardAnalyzer(), create); 
+                indexWriter = new IndexWriter(System.getenv("LUCENE_INDEX"), new StandardAnalyzer(), create); 
             } catch(IOException e) {
                 System.out.println(e);
             } 
@@ -56,19 +56,16 @@ public class Indexer {
      */
      
     public void indexItem(int id, String name, String description, String categories) throws IOException  {
-         IndexWriter writer = getIndexWriter(false);
+        IndexWriter writer = getIndexWriter(false);
         
-                Document doc = new Document();
-        
-           
-        
-                doc.add(new Field("ud", String.valueOf(id), Field.Store.YES, Field.Index.NO));
-                doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
-                doc.add(new Field("description", description, Field.Store.NO, Field.Index.TOKENIZED));
-                String fullSearchableText = String.valueOf(id) + " " + categories + " " + description;
-                doc.add(new Field("content", fullSearchableText, Field.Store.NO, Field.Index.TOKENIZED));
-                writer.addDocument(doc);
-        System.out.println(id + " " + name + " " + categories);
+        Document doc = new Document();
+
+        doc.add(new Field("id", String.valueOf(id), Field.Store.YES, Field.Index.NO));
+        doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("description", description, Field.Store.NO, Field.Index.TOKENIZED));
+        String fullSearchableText = String.valueOf(id) + " " + categories + " " + description;
+        doc.add(new Field("content", fullSearchableText, Field.Store.NO, Field.Index.TOKENIZED));
+        writer.addDocument(doc);
     }
  
     /**
@@ -111,7 +108,7 @@ public class Indexer {
         // Query the database for the items to build the index on.
         // Create a statement to query DB
         Statement stmt = conn.createStatement();
-        System.out.println("1");
+
         String sql = "SELECT Item.ItemID, Item.Name, Item.Description, C.Categories "
                    + "FROM (SELECT ItemID, group_concat(Category.Category SEPARATOR ' ') AS Categories "
                                + "FROM Item_Category  "
@@ -121,10 +118,9 @@ public class Indexer {
                    + "INNER JOIN Item "
                    + "ON Item.ItemID = C.ItemID ";
 
-        System.out.println("2");
         // Fetch all the items
         ResultSet items = stmt.executeQuery(sql);
-        System.out.println("3");
+
         // Add an index on each item
         while(items.next()) {
             indexItem(items.getInt("ItemID"), items.getString("Name"),
