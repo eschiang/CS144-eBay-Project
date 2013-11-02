@@ -1,3 +1,5 @@
+-- buildSQLIndex.sql --
+
 USE CS144;
 
 CREATE INDEX SellerIndex ON Item(Seller);

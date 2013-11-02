@@ -1,6 +1,16 @@
-This example contains a simple utility class to simplify opening database
-connections in Java applications, such as the one you will write to build
-your Lucene index. 
+Partner 1: Meet Bhagdev
+ID: 104079094
+Email: meetbhagdev@ucla.edu
 
-To build and run the sample code, use the "run" ant target inside
-the directory with build.xml by typing "ant run".
+Partner 2: Joshua Dykstra
+ID: 903888459
+Email: dykstrajj@gmail.com
+
+We elected to created MySQL indexes on Buy_Price, Ends, and Seller
+in the Item table, and on UserID in the Bid table. We created 
+these indexes in MySQL because these fields don't hold text.
+
+We used Lucene to index the ItemID, Name, Description, Categories, 
+and the UNION(Name, Description, Categories) fields. To allow for more 
+efficient text searching on these fields of the Item table.
+

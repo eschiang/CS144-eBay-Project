@@ -1,3 +1,5 @@
+-- dropSQLIndex.sql --
+
 USE CS144;
 
 ALTER IGNORE TABLE Item DROP INDEX SellerIndex;
