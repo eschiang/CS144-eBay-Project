@@ -62,8 +62,9 @@ public class Indexer {
 
         doc.add(new Field("id", String.valueOf(id), Field.Store.YES, Field.Index.NO));
         doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("category", categories, Field.Store.NO, Field.Index.TOKENIZED))
         doc.add(new Field("description", description, Field.Store.NO, Field.Index.TOKENIZED));
-        String fullSearchableText = String.valueOf(id) + " " + categories + " " + description;
+        String fullSearchableText = String.valueOf(id) + " " + name +  " " + categories + " " + description;
         doc.add(new Field("content", fullSearchableText, Field.Store.NO, Field.Index.TOKENIZED));
         writer.addDocument(doc);
     }

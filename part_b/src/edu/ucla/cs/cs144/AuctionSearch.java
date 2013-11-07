@@ -17,6 +17,7 @@ import org.apache.lucene.search.Query;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Stack;
 import java.text.SimpleDateFormat;
 
 import edu.ucla.cs.cs144.DbManager;
@@ -44,15 +45,14 @@ public class AuctionSearch implements IAuctionSearch {
          * placed at src/edu/ucla/cs/cs144.
          *
          */
-	
 	public SearchResult[] basicSearch(String query, int numResultsToSkip, 
 			int numResultsToReturn) {
-		  SearchResult[] resultstore = new SearchResult[0];
-
+                SearchResult[] resultstore = new SearchResult[0];
                 try 
                 {
-                         searcher = new IndexSearcher(System.getenv("LUCENE_INDEX"));
-                         parser = new QueryParser("content", new StandardAnalyzer());
+                        // Access the lucene index
+                        searcher = new IndexSearcher(System.getenv("LUCENE_INDEX"));
+                        parser = new QueryParser("content", new StandardAnalyzer());
 
                         Query q = parser.parse(query);        
                         Hits hits = searcher.search(q);
@@ -63,18 +63,21 @@ public class AuctionSearch implements IAuctionSearch {
                         else
                                 resultstore = new SearchResult[hits.length()];
                         
-                        //Iterator for the hits(matches found)
+                        // Iterators for the hits(matches found)
+                        // And for resultsStore to return
                         Iterator<Hit> it =  hits.iterator();
-                        int i= 0;
+                        int i = 0;
+                        int resultIndex = 0;
                         
                         // Following Code will try to find the hits.
-                        //stores hits in resultstore
+                        // stores hits in resultstore
                         while(it.hasNext() && (numResultsToReturn == 0 || (i < hits.length() && i - numResultsToSkip < numResultsToReturn)))
                         {
                                 if (i > numResultsToSkip - 1) {
                                         Hit hit = it.next();
                                         Document doc = hit.getDocument();
-                                        resultstore[i] = new SearchResult(doc.get("id"), doc.get("name"));
+                                        resultstore[resultIndex] = new SearchResult(doc.get("id"), doc.get("name"));
+                                        resultIndex++;
                                 }
                                 
                                 i++;
@@ -82,18 +85,79 @@ public class AuctionSearch implements IAuctionSearch {
                 } 
                 catch (Exception e) 
                 {
-                        System.out.println("xyz");
+                        System.out.println(e);
                         
                 }
                 
                 return resultstore;
-		// TODO: Your code here!
 	}
+
+        // Build the lucene query from the given constraints
+        public String buildLuceneQuery(SearchConstraint[] constraints)
+        {
+                // Add queries to a list
+                Stack<String> fieldQueries = new Stack();
+
+                // Iterate over constraints and determine which 
+                // are on fields that are indexed by lucene
+                int numConstraints = constraints.length;
+                for(int i = 0; i < numConstraints; i++)
+                {
+                        // Pull out Lucene indexed constraints
+                        if(constraints[i].getValue().equals("ItemName"))
+                                fieldQueries.push("name:" + constraints[i].getValue());
+                       
+                        else if(constraints[i].getValue().equals("Category"))
+                                fieldQueries.push("category:" + constraints[i].getValue());
+                                
+                        else if(constraints[i].getValue().equals("Description"))
+                                fieldQueries.push("description:" + constraints[i].getValue());
+                        
+                }
+
+                // Build final query string
+                StringBuilder query = new StringBuilder();
+                query.append(fieldQueries.pop());
+                while(!fieldQueries.empty())
+                {
+                        String next = fieldQueries.pop();
+                        query.append(" AND ");
+                        query.append(next);
+                }
+
+                return query.toString();
+        }
 
 	public SearchResult[] advancedSearch(SearchConstraint[] constraints, 
 			int numResultsToSkip, int numResultsToReturn) {
-		// TODO: Your code here!
-		return new SearchResult[0];
+                SearchResult[] resultstore = new SearchResult[0];
+		try 
+                {
+                        // Query
+                        String luceneQuery = buildLuceneQuery(constraints);
+
+                        // Access the lucene index 
+                        // Query Parser has no default field because 
+                        // query will specify fields.
+                        searcher = new IndexSearcher(System.getenv("LUCENE_INDEX"));
+                        parser = new QueryParser("content", new StandardAnalyzer());
+
+                        // Execute Query
+                        Query q = parser.parse(luceneQuery);        
+                        Hits hits = searcher.search(q);
+
+                }
+                catch (Exception e) 
+                {
+                        System.out.println(e);
+                        
+                }
+                
+                // Handle SQL querying
+
+
+
+		return resultstore;
 	}
 
 	public String getXMLDataForItemId(String itemId) {
