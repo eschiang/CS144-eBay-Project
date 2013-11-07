@@ -24,7 +24,8 @@ import edu.ucla.cs.cs144.SearchConstraint;
 import edu.ucla.cs.cs144.SearchResult;
 
 public class AuctionSearch implements IAuctionSearch {
-
+	IndexSearcher searcher;
+	QueryParser parser;
 	/* 
          * You will probably have to use JDBC to access MySQL data
          * Lucene IndexSearcher class to lookup Lucene index.
@@ -46,8 +47,47 @@ public class AuctionSearch implements IAuctionSearch {
 	
 	public SearchResult[] basicSearch(String query, int numResultsToSkip, 
 			int numResultsToReturn) {
+		  SearchResult[] resultstore = new SearchResult[0];
+
+                try 
+                {
+                         searcher = new IndexSearcher(System.getenv("LUCENE_INDEX"));
+                         parser = new QueryParser("content", new StandardAnalyzer());
+
+                        Query q = parser.parse(query);        
+                        Hits hits = searcher.search(q);
+
+                        // Allocate the results array
+                        if (numResultsToReturn != 0 && numResultsToReturn - numResultsToSkip < hits.length())
+                                resultstore = new SearchResult[numResultsToReturn];
+                        else
+                                resultstore = new SearchResult[hits.length()];
+                        
+                        //Iterator for the hits(matches found)
+                        Iterator<Hit> it =  hits.iterator();
+                        int i= 0;
+                        
+                        // Following Code will try to find the hits.
+                        //stores hits in resultstore
+                        while(it.hasNext() && (numResultsToReturn == 0 || (i < hits.length() && i - numResultsToSkip < numResultsToReturn)))
+                        {
+                                if (i > numResultsToSkip - 1) {
+                                        Hit hit = it.next();
+                                        Document doc = hit.getDocument();
+                                        resultstore[i] = new SearchResult(doc.get("id"), doc.get("name"));
+                                }
+                                
+                                i++;
+                        }
+                } 
+                catch (Exception e) 
+                {
+                        System.out.println("xyz");
+                        
+                }
+                
+                return resultstore;
 		// TODO: Your code here!
-		return new SearchResult[0];
 	}
 
 	public SearchResult[] advancedSearch(SearchConstraint[] constraints, 
@@ -66,3 +106,4 @@ public class AuctionSearch implements IAuctionSearch {
 	}
 
 }
+
