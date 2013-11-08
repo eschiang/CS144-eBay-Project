@@ -15,9 +15,7 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Stack;
+import java.util.*;
 import java.text.SimpleDateFormat;
 
 import edu.ucla.cs.cs144.DbManager;
@@ -92,70 +90,189 @@ public class AuctionSearch implements IAuctionSearch {
                 return resultstore;
 	}
 
+        /* Returns the date from the xml files' format (Dec-04-01 04:03:12)
+         * converted to MySQL timestamp readable format.
+         */
+        static String convertDate(String dateString) {
+                String old_format = "MMM-dd-yy HH:mm:ss";
+                String new_format = "yyyy-MM-dd HH:mm:ss";
+
+                SimpleDateFormat sdf = new SimpleDateFormat(old_format);
+                String out = "";
+                try {
+                        Date d = sdf.parse(dateString);
+                        sdf.applyPattern(new_format);
+                        out = sdf.format(d);
+                } catch (Exception e) {
+                        System.out.println("Could not format date");
+                }
+
+                return out;
+        }
+
         // Build the lucene query from the given constraints
-        public String buildLuceneQuery(SearchConstraint[] constraints)
-        {
+        public String buildLuceneQuery(SearchConstraint[] constraints) {
                 // Add queries to a list
                 Stack<String> fieldQueries = new Stack();
 
-                // Iterate over constraints and determine which 
-                // are on fields that are indexed by lucene
+                // Iterate over constraints and push if 
+                // on a field that is indexed by lucene
                 int numConstraints = constraints.length;
-                for(int i = 0; i < numConstraints; i++)
-                {
+                for(int i = 0; i < numConstraints; i++) {
                         // Pull out Lucene indexed constraints
-                        if(constraints[i].getValue().equals("ItemName"))
+                        if(constraints[i].getFieldName().equals(FieldName.ItemName))
                                 fieldQueries.push("name:" + constraints[i].getValue());
                        
-                        else if(constraints[i].getValue().equals("Category"))
+                        else if(constraints[i].getFieldName().equals(FieldName.Category))
                                 fieldQueries.push("category:" + constraints[i].getValue());
                                 
-                        else if(constraints[i].getValue().equals("Description"))
+                        else if(constraints[i].getFieldName().equals(FieldName.Description))
                                 fieldQueries.push("description:" + constraints[i].getValue());
                         
                 }
 
-                // Build final query string
+                // Build final query String
                 StringBuilder query = new StringBuilder();
-                query.append(fieldQueries.pop());
-                while(!fieldQueries.empty())
-                {
-                        String next = fieldQueries.pop();
-                        query.append(" AND ");
-                        query.append(next);
+                if(!fieldQueries.empty()) {
+                        query.append(fieldQueries.pop());
+                        while(!fieldQueries.empty()) {
+                                String next = fieldQueries.pop();
+                                query.append(" AND ");
+                                query.append(next);
+                        }
                 }
 
                 return query.toString();
         }
 
+        public String buildSqlQuery(SearchConstraint[] constraints) {
+                
+                Stack<String> whereClauses = new Stack();
+                // Iterate over constraints and push if
+                // on a field that are indexed by lucene
+                int numConstraints = constraints.length;
+                boolean bidJoin = false;
+                for(int i = 0; i < numConstraints; i++) {
+
+                        // Pull out MySQL indexed constraints
+                        if(constraints[i].getFieldName().equals(FieldName.SellerId))
+                                whereClauses.push("Seller = '" + constraints[i].getValue() + "'");
+                       
+                        else if(constraints[i].getFieldName().equals(FieldName.BuyPrice))
+                                whereClauses.push("Buy_Price = " + constraints[i].getValue());
+                                
+                        else if(constraints[i].getFieldName().equals(FieldName.EndTime))
+                                whereClauses.push("Ends = \"" + convertDate(constraints[i].getValue()) + "\"");
+
+                        else if(constraints[i].getFieldName().equals(FieldName.BidderId)) {
+                                bidJoin = true;
+                                whereClauses.push("UserID = '" + constraints[i].getValue() + "'");
+                        }
+                        
+                }
+
+                StringBuilder query = new StringBuilder();      
+                if(!whereClauses.empty()) {
+                        query.append("SELECT ItemID, Name FROM Item ");
+                        if (bidJoin)
+                                query.append("INNER JOIN Bid ON Item.ItemID = Bid.ItemID ");
+
+                        query.append("WHERE " + whereClauses.pop() + " ");
+
+                        while(!whereClauses.empty()) {
+                                query.append("AND " + whereClauses.pop() + " ");
+                        }
+                }
+                System.out.println(query.toString());
+                return query.toString();
+        }
+
 	public SearchResult[] advancedSearch(SearchConstraint[] constraints, 
 			int numResultsToSkip, int numResultsToReturn) {
-                SearchResult[] resultstore = new SearchResult[0];
-		try 
-                {
-                        // Query
+                
+                // Handle Lucene querying
+                Map<String, String> luceneResult = new HashMap<String, String>();
+		try {
                         String luceneQuery = buildLuceneQuery(constraints);
 
-                        // Access the lucene index 
-                        // Query Parser has no default field because 
-                        // query will specify fields.
-                        searcher = new IndexSearcher(System.getenv("LUCENE_INDEX"));
-                        parser = new QueryParser("content", new StandardAnalyzer());
+                        if(!luceneQuery.isEmpty()) {
+                                // Access the lucene index 
+                                // Query Parser has no default field because 
+                                // query will specify fields.
+                                searcher = new IndexSearcher(System.getenv("LUCENE_INDEX"));
+                                parser = new QueryParser("content", new StandardAnalyzer());
 
-                        // Execute Query
-                        Query q = parser.parse(luceneQuery);        
-                        Hits hits = searcher.search(q);
+                                // Execute Query
+                                Query q = parser.parse(luceneQuery);        
+                                Hits hits = searcher.search(q);
 
-                }
-                catch (Exception e) 
-                {
+                                Iterator<Hit> it = hits.iterator();
+
+                                // Place all the itemIDs a set for quick intersection later
+                                while(it.hasNext()) {
+                                        Hit hit = it.next();
+                                        Document doc = hit.getDocument();
+                                        luceneResult.put(doc.get("id"), doc.get("name"));
+                                }
+                        }
+
+                } catch (Exception e) {
                         System.out.println(e);
-                        
                 }
                 
                 // Handle SQL querying
+                Map<String, String> sqlResult = new HashMap<String, String>();
+                Connection conn = null;
+                try {
 
+                        String sqlQuery = buildSqlQuery(constraints);
 
+                        conn = DbManager.getConnection(true);
+                        Statement stmt = conn.createStatement();
+
+                        // Execute query
+                        ResultSet items = stmt.executeQuery(sqlQuery);
+
+                        
+                        if(!sqlQuery.isEmpty())
+                        {
+                                
+                                while(items.next()) {
+                                        sqlResult.put(items.getString("ItemID"), items.getString("Name"));         
+                                }
+                        }
+                }
+                catch (Exception e) {
+                        System.out.println(e);
+                }
+
+                // Create the final SearchResult
+                // Determine if we must do an intersection 
+                Set<String> itemIds;
+                Map<String, String> result;
+                if(sqlResult.isEmpty()) {
+                        itemIds = luceneResult.keySet();
+                        result = luceneResult;
+                } else if(luceneResult.isEmpty()) {
+                        itemIds = sqlResult.keySet();
+                        result = sqlResult;
+                } else {
+                        itemIds = luceneResult.keySet();
+                        itemIds.retainAll(sqlResult.keySet());
+                        result = luceneResult;
+                }
+
+                // Add the keys and itemIds to the SearchResult array
+                SearchResult[] resultstore = new SearchResult[itemIds.size()];
+
+                Iterator<String> i = itemIds.iterator();
+                int resultIndex = 0;
+
+                while(i.hasNext()) {
+                        String itemId = i.next();
+                        resultstore[resultIndex] = new SearchResult(itemId, result.get(itemId));
+                        resultIndex++;
+                }
 
 		return resultstore;
 	}
