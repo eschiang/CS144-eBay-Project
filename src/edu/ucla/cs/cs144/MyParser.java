@@ -464,7 +464,7 @@ class MyParser {
             for (Map.Entry<String, Item> entry : itemMap.entrySet()) {
                 Item itemEntry = entry.getValue();
                   
-                String entrycsv = String.format("%s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s \n", 
+                String entrycsv = String.format("%s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s |*| %s\n", 
                        itemEntry.i_id,
                        itemEntry.i_name,
                        itemEntry.i_description,
@@ -493,7 +493,7 @@ class MyParser {
             for (Map.Entry<String, User> entry : userMap.entrySet()) {
                 User userEntry = entry.getValue();
 
-                String entrycsv = String.format("%s |*| %s |*| %s |*| %s \n", 
+                String entrycsv = String.format("%s |*| %s |*| %s |*| %s\n", 
                         userEntry.u_name,
                         userEntry.u_rating,
                         userEntry.u_location,
@@ -516,7 +516,7 @@ class MyParser {
             for (Map.Entry<String, Category> entry : categoryMap.entrySet()) {
                 Category categoryEntry = entry.getValue();
 
-                String entrycsv = String.format("%s |*| %s \n", 
+                String entrycsv = String.format("%s |*| %s\n", 
                             String.valueOf(categoryEntry.c_categoryID),
                             categoryEntry.c_name);
                 categorywriter.write(entrycsv); 
@@ -536,7 +536,7 @@ class MyParser {
             for (Map.Entry<String, ItemCategory> entry : itemcategoriesMap.entrySet()) {
                 ItemCategory icEntry = entry.getValue();
                
-                String entrycsv = String.format("%s |*| %s \n", 
+                String entrycsv = String.format("%s |*| %s\n", 
                         icEntry.ic_itemID,
                         String.valueOf(icEntry.ic_categoryID));
 
