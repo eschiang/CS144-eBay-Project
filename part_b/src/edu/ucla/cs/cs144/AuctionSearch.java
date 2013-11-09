@@ -377,12 +377,12 @@ public class AuctionSearch implements IAuctionSearch {
                         // Add Location and Country elements if they aren't NULL
                         if (!bidresult.getString("Location").equals("")) {
                             Element location_element = doc.createElement("Location");
-                            location_element.appendChild(doc.createTextNode((replacespecial(bidresult.getString("Location"))));
+                            location_element.appendChild(doc.createTextNode((replacespecial(bidresult.getString("Location")))));
                             bidder_element.appendChild(location_element);
                         }
                         if (!bidresult.getString("Country").equals("")) {
                             Element country_element = doc.createElement("Country");
-                            country_element.appendChild(doc.createTextNode((replacespecial(bidresult.getString("Country"))));
+                            country_element.appendChild(doc.createTextNode((replacespecial(bidresult.getString("Country")))));
                             bidder_element.appendChild(country_element);
                         }
                         bid_element.appendChild(bidder_element);
@@ -417,12 +417,12 @@ public class AuctionSearch implements IAuctionSearch {
                 sellres.first();
              
                 Element location_element = doc.createElement("Location");
-                location_element.appendChild(doc.createTextNode((replacespecial(sellres.getString("Location"))));
+                location_element.appendChild(doc.createTextNode((replacespecial(sellres.getString("Location")))));
                 root.appendChild(location_element);
 
                 // country
                 Element country_element = doc.createElement("Country");
-                country_element.appendChild(doc.createTextNode((replacespecial(sellres.getString("Country"))));
+                country_element.appendChild(doc.createTextNode((replacespecial(sellres.getString("Country")))));
                 root.appendChild(country_element);
 
                 // started
@@ -436,13 +436,13 @@ public class AuctionSearch implements IAuctionSearch {
                 root.appendChild(ends_element);
                 // seller
                 Element sellerElem = doc.createElement("Seller");
-                sellerElem.setAttribute("UserID", (replacespecial(sellres.getString("UserID")));
+                sellerElem.setAttribute("UserID", (replacespecial(sellres.getString("UserID"))));
                 sellerElem.setAttribute("Rating", sellres.getString("Rating"));
                 root.appendChild(sellerElem);
 
                 // description
                 Element description_element = doc.createElement("Description");
-                description_element.appendChild(doc.createTextNode(replacespecial(result.getString("Description"))));;
+                description_element.appendChild(doc.createTextNode(replacespecial(result.getString("Description"))));
                 root.appendChild(description_element);
 
                 sellres.close();
@@ -455,6 +455,7 @@ public class AuctionSearch implements IAuctionSearch {
                 StringWriter writer = new StringWriter();
                 StreamResult res = new StreamResult(writer);
                 transform.setOutputProperty(OutputKeys.INDENT, "yes");
+                transform.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                 transform.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
                 transform.transform(source, res);
                 xmlstore = writer.toString();
