@@ -316,7 +316,7 @@ public class AuctionSearch implements IAuctionSearch {
                 doc.appendChild(root);
 
                 Element element_name = doc.createElement("Name");
-                element_name.appendChild(doc.createTextNode(result.getString("Name")));
+                element_name.appendChild(doc.createTextNode(replacespecial(result.getString("Name"))));
                 root.appendChild(element_name);
 
                 
@@ -331,7 +331,7 @@ public class AuctionSearch implements IAuctionSearch {
                 Element category_element;
                 while (catresult.next()) {
                     category_element = doc.createElement("Category");
-                    category_element.appendChild(doc.createTextNode(catresult.getString("Category")));
+                    category_element.appendChild(doc.createTextNode(replacespecial(catresult.getString("Category"))));
                     root.appendChild(category_element);
                 }
 
@@ -371,18 +371,18 @@ public class AuctionSearch implements IAuctionSearch {
                     try {
                         Element bid_element = doc.createElement("Bid");
                         Element bidder_element = doc.createElement("Bidder");
-                        bidder_element.setAttribute("UserID", bidresult.getString("UserID"));
+                        bidder_element.setAttribute("UserID", replacespecial(bidresult.getString("UserID")));
                         bidder_element.setAttribute("Rating", bidresult.getString("Rating"));
 
                         // Add Location and Country elements if they aren't NULL
                         if (!bidresult.getString("Location").equals("")) {
                             Element location_element = doc.createElement("Location");
-                            location_element.appendChild(doc.createTextNode(bidresult.getString("Location")));
+                            location_element.appendChild(doc.createTextNode((replacespecial(bidresult.getString("Location"))));
                             bidder_element.appendChild(location_element);
                         }
                         if (!bidresult.getString("Country").equals("")) {
                             Element country_element = doc.createElement("Country");
-                            country_element.appendChild(doc.createTextNode(bidresult.getString("Country")));
+                            country_element.appendChild(doc.createTextNode((replacespecial(bidresult.getString("Country"))));
                             bidder_element.appendChild(country_element);
                         }
                         bid_element.appendChild(bidder_element);
@@ -417,12 +417,12 @@ public class AuctionSearch implements IAuctionSearch {
                 sellres.first();
              
                 Element location_element = doc.createElement("Location");
-                location_element.appendChild(doc.createTextNode(sellres.getString("Location")));
+                location_element.appendChild(doc.createTextNode((replacespecial(sellres.getString("Location"))));
                 root.appendChild(location_element);
 
                 // country
                 Element country_element = doc.createElement("Country");
-                country_element.appendChild(doc.createTextNode(sellres.getString("Country")));
+                country_element.appendChild(doc.createTextNode((replacespecial(sellres.getString("Country"))));
                 root.appendChild(country_element);
 
                 // started
@@ -436,13 +436,13 @@ public class AuctionSearch implements IAuctionSearch {
                 root.appendChild(ends_element);
                 // seller
                 Element sellerElem = doc.createElement("Seller");
-                sellerElem.setAttribute("UserID", sellres.getString("UserID"));
+                sellerElem.setAttribute("UserID", (replacespecial(sellres.getString("UserID")));
                 sellerElem.setAttribute("Rating", sellres.getString("Rating"));
                 root.appendChild(sellerElem);
 
                 // description
                 Element description_element = doc.createElement("Description");
-                description_element.appendChild(doc.createTextNode(result.getString("Description")));
+                description_element.appendChild(doc.createTextNode(replacespecial(result.getString("Description"))));;
                 root.appendChild(description_element);
 
                 sellres.close();
@@ -458,6 +458,7 @@ public class AuctionSearch implements IAuctionSearch {
                 transform.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
                 transform.transform(source, res);
                 xmlstore = writer.toString();
+                xmlstore = replacespecial1(xmlstore);
             }
 
             result.close();
@@ -476,6 +477,22 @@ public class AuctionSearch implements IAuctionSearch {
         return xmlstore;
     
     }
+       private String replacespecial(String s) {
+       	return s.replaceAll("\"", "thisisaquotethatwehavetohandle")
+                                .replaceAll("\'", "thisisanaposweneedtohandle")
+                                
+                                ;
+                
+              
+        }
+         private String replacespecial1(String s) {
+       	return s.replaceAll( "thisisaquotethatwehavetohandle", "&quot;")
+                                .replaceAll( "thisisanaposweneedtohandle","&apos;")
+                                
+                               ;
+                
+              
+        }
     
     public String echo(String message) {
         return message;
