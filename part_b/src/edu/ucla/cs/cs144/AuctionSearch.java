@@ -21,9 +21,24 @@ import java.text.SimpleDateFormat;
 import edu.ucla.cs.cs144.DbManager;
 import edu.ucla.cs.cs144.SearchConstraint;
 import edu.ucla.cs.cs144.SearchResult;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
 public class AuctionSearch implements IAuctionSearch {
 	IndexSearcher searcher;
+	        String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
 	QueryParser parser;
 	/* 
          * You will probably have to use JDBC to access MySQL data
@@ -227,7 +242,7 @@ public class AuctionSearch implements IAuctionSearch {
 
                         String sqlQuery = buildSqlQuery(constraints);
 
-                        conn = DbManager.getConnection(true);
+            conn = DbManager.getConnection(true);
                         Statement stmt = conn.createStatement();
 
                         // Execute query
@@ -277,10 +292,228 @@ public class AuctionSearch implements IAuctionSearch {
 		return resultstore;
 	}
 
-	public String getXMLDataForItemId(String itemId) {
+		public String getXMLDataForItemId(String itemId) {
+				String xmlstore="";
+
+                String xml = "";
+     
+                Connection conn = null;
+
+                // create a connection to the database
+                try 
+                {
+                		//Connetion to db manager
+                        conn = DbManager.getConnection(true);
+                        Statement statement = conn.createStatement();
+                        //Geting the items
+                        ResultSet result = statement.executeQuery(
+                                                "SELECT * FROM Item" + 
+                                                " WHERE " + "Item." + "ItemID" + " = \"" + itemId + "\"");
+                        
+                        result.first();
+                        //Somethings in it
+                        if (result.getRow() != 0) 
+                        {                             
+                              
+                                DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
+                                DocumentBuilder b          = fac.newDocumentBuilder();
+                                org.w3c.dom.Document doc   = b.newDocument();
+
+                                // root element
+                                Element root = doc.createElement("Item");
+                                root.setAttribute("ItemID", itemId);
+                                doc.appendChild(root);
+
+                                Element element_name = doc.createElement("Name");
+                                element_name.appendChild(doc.createTextNode(result.getString("Name")));
+                                root.appendChild(element_name);
+
+                                
+                                // Parse Category tag
+                                // First, get the Categories
+                                Statement catstatement = conn.createStatement();
+                                // Getting the categoru
+                                ResultSet catresult = catstatement.executeQuery(
+                                                        "SELECT Category FROM Category,Item_Category" + 
+                                                        " WHERE " + "Item_Category." + "ItemID" + " = \"" + itemId + "\" AND "
+                                                        + "Item_Category." + "CategoryID"+ " = " + "Category." + "CategoryID");
+
+                                Element category_element;
+                                 while (catresult.next()) {
+                                         category_element = doc.createElement("Category");
+                                        category_element.appendChild(doc.createTextNode(catresult.getString("Category")));
+                                        root.appendChild(category_element);
+                                }
+
+
+	                            catresult.close();
+	                            catstatement.close();
+	                            Element currently_element = doc.createElement("Currently");
+                                currently_element.appendChild(doc.createTextNode("$" + result.getString("Currently")));
+                                root.appendChild(currently_element);
+
+						   		String buy=result.getString("Buy_Price");
+					
+	                            Element buyprice_element = doc.createElement("Buy_Price");
+	                            buyprice_element.appendChild(doc.createTextNode("$" + buy));
+	                            root.appendChild(buyprice_element);
+                              //  }
+			
+                                Element start_element = doc.createElement("First_Bid");
+                                start_element.appendChild(doc.createTextNode("$" + result.getString("First_Bid")));
+                                root.appendChild(start_element);
+
+                                // num bids
+                                Element numberbids_elements = doc.createElement("Number_of_Bids");
+                                numberbids_elements.appendChild(doc.createTextNode(result.getString("Number_of_Bids")));
+                                root.appendChild(numberbids_elements);
+
+                                Statement bidstatement = conn.createStatement();
+                                ResultSet bidresult = bidstatement.executeQuery(
+                                                        "SELECT * FROM Bid, User " + 
+                                                        " WHERE " + "Bid." + "ItemId" + " = \"" + itemId + "\" AND "
+                                                                          + "Bid." + "UserID" + " = User." + "UserID");
+
+                             	Element bids_element = doc.createElement("Bids");
+                                Element bid_element;
+
+                                
+                             	bid_element = doc.createElement("Bid");
+                                bids_element.appendChild(bid_element);
+
+             					int i=0;
+                                while (bidresult.next()) 
+                                {
+                                        try {
+                                        	
+                                        	bid_element = doc.createElement("Bid");
+	                                        Element bidder_element = doc.createElement("Bidder");
+	                                        bidder_element.setAttribute("UserID", bidresult.getString("UserID"));
+	                                        bidder_element.setAttribute("Rating", bidresult.getString("Rating"));
+	                                        if (!bidresult.getString("Location").equals("")) 
+	                                        {
+                                                Element location_element = doc.createElement("Location");
+                                                location_element.appendChild(doc.createTextNode(bidresult.getString("UserID")));
+                                                bidder_element.appendChild(location_element);
+                                        	}
+	                                        if (!bidresult.getString("Country").equals("")) 
+	                                        {
+	                                                Element country_element = doc.createElement("Country");
+	                                                country_element.appendChild(doc.createTextNode(bidresult.getString("Country")));
+	                                                bidder_element.appendChild(country_element);
+	                                        }
+                                        	bid_element.appendChild(bidder_element);
+
+	                                        // time
+	                                        Element time_element = doc.createElement("Time");
+	                                        time_element.appendChild(doc.createTextNode(formatDate(bidresult.getString("Time"))));
+	                                        bid_element.appendChild(time_element);
+
+	                                        // amount
+	                                        Element amount_element = doc.createElement("Amount"); 
+	                                        amount_element.appendChild(doc.createTextNode(bidresult.getString("Amount")));
+	                                        bid_element.appendChild(amount_element);
+
+	                                        bids_element.appendChild(bid_element);
+                                        	} 
+                                        	catch (SQLException e) 
+                                        	{}
+                                }
+
+                                root.appendChild(bids_element);
+
+
+                                bidresult.close();
+                                bidstatement.close();
+                                
+                                // Get the Seller data
+                                Statement sellstatement = conn.createStatement();
+                                ResultSet sellres = sellstatement.executeQuery(
+                                                        "SELECT UserID, Rating, Location, Country FROM Item, User " + 
+                                                        " WHERE " + "Item." + "ItemID" + " = \"" + itemId + "\" AND "
+                                                                          + "Item." + "Seller" + " = User." + "UserID");
+                                sellres.first();
+
+                             
+                                Element location_element = doc.createElement("Location");
+                                location_element.appendChild(doc.createTextNode(sellres.getString("Location")));
+                                root.appendChild(location_element);
+
+                                // country
+                                Element country_element = doc.createElement("Country");
+                                country_element.appendChild(doc.createTextNode((sellres.getString("Country"))));
+                                root.appendChild(country_element);
+
+                                // started
+                                Element started_elem = doc.createElement("Started");
+                                started_elem.appendChild(doc.createTextNode(formatDate(result.getString("Started"))));
+                                root.appendChild(started_elem);
+
+                                // ends
+                                Element ends_element = doc.createElement("Ends");
+                                ends_element.appendChild(doc.createTextNode(formatDate(result.getString("Ends"))));
+                                root.appendChild(ends_element);
+                                // seller
+                                Element sellerElem = doc.createElement("Seller");
+                                sellerElem.setAttribute("UserID", sellres.getString("UserID"));
+                                sellerElem.setAttribute("Rating", sellres.getString("Rating"));
+                                root.appendChild(sellerElem);
+                                // description
+                                Element description_element = doc.createElement("Description");
+                                description_element.appendChild(doc.createTextNode(result.getString("Description")));
+                                root.appendChild(description_element);
+                                sellres.close();
+                                sellstatement.close();
+                                TransformerFactory newfactory = TransformerFactory.newInstance();
+                                Transformer transform = newfactory.newTransformer();
+                                DOMSource source = new DOMSource(doc);
+                                StringWriter writer = new StringWriter();
+                                StreamResult res = new StreamResult(writer);
+                                transform.setOutputProperty(OutputKeys.INDENT, "yes");
+                				transform.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                                transform.transform(source, res);
+                                xmlstore = writer.toString();
+                        }
+
+
+                        result.close();
+                        statement.close();
+
+                        conn.close();
+
+  
+                }
+                catch (SQLException ex) 
+                {
+                        System.out.println(ex);
+                        
+                }
+                  catch (ParserConfigurationException e) {
+                        System.out.println("oops");
+                } catch (TransformerException e) {
+                        System.out.println("oops");
+                }
+
+                return xmlstore;
 		// TODO: Your code here!
-		return null;
+	
 	}
+	   
+       
+        
+            private String formatDate(String s) {
+                int month = Integer.parseInt(s.substring(5, 7)) - 1;
+                
+                String date = "";
+                
+                date += months[month];                                          // Format month
+                date += s.substring(7, 10);                                     // Format day
+                date += "-";
+                date += s.substring(2, 4);                                      // Format year
+                date += s.substring(10, s.length() - 2);        // Format time
+                
+                return date;
+        }
 	
 	public String echo(String message) {
 		return message;
