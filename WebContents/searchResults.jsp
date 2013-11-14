@@ -1,13 +1,14 @@
-<DOCTYPE !html>
+<%@ page import="edu.ucla.cs.cs144.*" %>
+<!DOCTYPE html>
 <html>
 	<head>
 	</head>
 
 	<body>
 		<ul>
-		<% searchResult[] results = request.getAttribute("results");
-			int numResults = request.getAttribute("numResults");
-			for(int i = 0; i < numResults; i++) { %>
+		<% SearchResult[] results = (SearchResult[]) request.getAttribute("results");
+			Integer numResults = (Integer) request.getAttribute("numResults");
+			for(int i = 0; i < 10; i++) { %>
 			<li><a href="/items?id=<%= results[i].getItemId()%>"><%= results[i].getName() %></a></li>
 
 			<% } %>
