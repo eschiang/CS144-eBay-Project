@@ -9,7 +9,7 @@
 		<% SearchResult[] results = (SearchResult[]) request.getAttribute("results");
 			Integer numResults = (Integer) request.getAttribute("numResults");
 			for(int i = 0; i < 10; i++) { %>
-			<li><a href="/items?id=<%= results[i].getItemId()%>"><%= results[i].getName() %></a></li>
+			<li><a href="/eBay/item?id=<%= results[i].getItemId()%>"><%= results[i].getName() %></a></li>
 
 			<% } %>
 		</ul>
