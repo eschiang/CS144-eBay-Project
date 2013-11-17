@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.Vector;
-/
+
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -51,117 +51,19 @@ public class ItemServlet extends HttpServlet implements Servlet {
     public ItemServlet() {}
 
     String bidstring;
-                     SortedSet bidset = new TreeSet(); 
+    SortedSet bidset = new TreeSet(); 
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////Our Code from Mypareser.java///////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
-      public static class Category {
-        int c_categoryID;
-        String c_name;
-
-        public Category(int categoryID, String name) {
-            c_categoryID = categoryID;
-            c_name = name;
-        }
-    }
-
-    /**
-* Item Category
-* Helper class to represent a single entry in Item_Category.csv
-*/
-    public static class ItemCategory {
-        String ic_itemID;
-        int ic_categoryID;
-
-        public ItemCategory(String itemID, int categoryID) {
-            ic_itemID = itemID;
-            ic_categoryID = categoryID;
-        }
-    }
-
-    /**
-* User
-* Helper class to represent a single entry in User.csv
-*/
-    public static class User {
-        String u_name;
-        String u_location;
-        String u_rating;
-        String u_country;
-
-        User(String name, String rating, String location, String country) {
-            u_name = name;
-            u_rating = rating;
-            u_location = location;
-            u_country = country;
-        }
-    }
- 
-    /**
-* Bid
-* Helper class to represent a single entry in Bid.csv
-*/
-    public static class Bid
-    {
-        String b_userid;
-        String b_time;
-        String b_item;
-        String b_amount;
-
-
-        Bid(String userID, String time, String itemID, String amount)
-        {
-          
-            b_userid = userID;
-            b_time = time;
-            b_item = itemID;
-            b_amount = amount;
-        }
-    }
-
-    /**
-* Item
-* Helper class to represent a single entry in Item.csv
-*/
-    public static class Item {
-        String i_id;
-        String i_name;
-        String i_description;
-        String i_started;
-        String i_ends;
-        String i_currently;
-        String i_firstbid;
-        String i_buyprice;
-        String i_numberofbids;
-        String i_seller;
-
-        Item(String id, String name, String description, String started, String ends, String currently,
-                String firstbid, String buyprice, String numberofbids, String seller) {
-
-            i_id = id;
-            i_name = name;
-            i_description = description;
-            i_started = started;
-            i_ends = ends;
-            i_currently = currently;
-            i_firstbid = firstbid;
-            i_buyprice = buyprice;
-            i_numberofbids = numberofbids;
-            i_seller = seller;
-        }
-    }
-    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
     // Maps which will hold entries for .csv files while parsing
     static Map<String, User> userMap = new HashMap<String, User>();
     static Map<String, Bid> bidMap = new HashMap<String, Bid>();
     static Map<String, Item> itemMap = new HashMap<String, Item>();
     static Map<String, Category> categoryMap = new HashMap<String, Category>();
-    static Map<String, ItemCategory> itemcategoriesMap = new HashMap<String, ItemCategory>();
     
-    static final String columnSeparator = "|*|";
     static DocumentBuilder builder;
 
     static final String[] typeName = {
@@ -220,8 +122,8 @@ public class ItemServlet extends HttpServlet implements Servlet {
     }
     
     /* Returns the first subelement of e matching the given tagName, or
-* null if one does not exist. NR means Non-Recursive.
-*/
+     * null if one does not exist. NR means Non-Recursive.
+     */
     static Element getElementByTagNameNR(Element e, String tagName) {
         Node child = e.getFirstChild();
         while (child != null) {
@@ -233,8 +135,8 @@ public class ItemServlet extends HttpServlet implements Servlet {
     }
     
     /* Returns the text associated with the given element (which must have
-* type #PCDATA) as child, or "" if it contains no text.
-*/
+     * type #PCDATA) as child, or "" if it contains no text.
+     */
     static String getElementText(Element e) {
         if (e.getChildNodes().getLength() == 1) {
             Text elementText = (Text) e.getFirstChild();
@@ -245,9 +147,9 @@ public class ItemServlet extends HttpServlet implements Servlet {
     }
     
     /* Returns the text (#PCDATA) associated with the first subelement X
-* of e with the given tagName. If no such X exists or X contains no
-* text, "" is returned. NR means Non-Recursive.
-*/
+     * of e with the given tagName. If no such X exists or X contains no
+     * text, "" is returned. NR means Non-Recursive.
+     */
     static String getElementTextByTagNameNR(Element e, String tagName) {
         Element elem = getElementByTagNameNR(e, tagName);
         if (elem != null)
@@ -257,8 +159,8 @@ public class ItemServlet extends HttpServlet implements Servlet {
     }
     
     /* Returns the amount (in XXXXX.xx format) denoted by a money-string
-* like $3,453.23. Returns the input if the input is an empty string.
-*/
+     * like $3,453.23. Returns the input if the input is an empty string.
+     */
     static String strip(String money) {
         if (money.equals(""))
             return money;
@@ -277,8 +179,8 @@ public class ItemServlet extends HttpServlet implements Servlet {
     }
 
     /* Returns the date from the xml files' format (Dec-04-01 04:03:12)
-* converted to MySQL timestamp readable format ().
-*/
+     * converted to MySQL timestamp readable format ().
+     */
     static String convertDate(String dateString) {
         String old_format = "MMM-dd-yy HH:mm:ss";
         String new_format = "yyyy-MM-dd HH:mm:ss";
@@ -296,82 +198,78 @@ public class ItemServlet extends HttpServlet implements Servlet {
         return out;
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////CODE FOR PROJECT 4/////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////JOSH SHOULD CHECK OUT///////////////////////////////////////////////////////////////////////////
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        // your codes here
-            try
-            {
-                 String id = request.getParameter("id");
-                 String xml = AuctionSearchClient.getXMLDataForItemId(id);
-                 
-                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                 factory.setValidating(false);
-                 factory.setIgnoringElementContentWhitespace(true);
-                 DocumentBuilder builder = factory.newDocumentBuilder();
+        try
+        {
+            String id = request.getParameter("id");
+            String xml = AuctionSearchClient.getXMLDataForItemId(id);
+             
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setValidating(false);
+            factory.setIgnoringElementContentWhitespace(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
 
-                StringReader reader = new StringReader(xml);
-                 Document doc = builder.parse(new InputSource(reader));
-                 Element itemElement = doc.getDocumentElement();
-                //     long itemID = Long.valueOf(itemElement.getAttribute("ItemID"));
-                   
-                // Get information about the item that belongs in itemMap
-                String itemID = itemElement.getAttribute("ItemID");
-                String name = getElementTextByTagNameNR(itemElement, "Name");
-                String start_time = convertDate(getElementTextByTagNameNR(itemElement, "Started"));
-                String end_time = convertDate(getElementTextByTagNameNR(itemElement, "Ends"));
-                String description = getElementTextByTagNameNR(itemElement, "Description");
-                // Trim the description if it is over 4000 chars.
-                if (description.length() > 4000)
-                        description = description.substring(0, 4000);
+            StringReader reader = new StringReader(xml);
+            Document doc = builder.parse(new InputSource(reader));
+            Element itemElement = doc.getDocumentElement();
+               
+            // Get information about the item that belongs in item
+            String itemID = itemElement.getAttribute("ItemID");
+            String name = getElementTextByTagNameNR(itemElement, "Name");
+            String start_time = convertDate(getElementTextByTagNameNR(itemElement, "Started"));
+            String end_time = convertDate(getElementTextByTagNameNR(itemElement, "Ends"));
+            String description = getElementTextByTagNameNR(itemElement, "Description");
+            
+            // Trim the description if it is over 4000 chars.
+            if (description.length() > 4000)
+                description = description.substring(0, 4000);
 
-                // Get current bidding information for the item
-                String currently = strip(getElementTextByTagNameNR(itemElement, "Currently"));
-                String buy_price = strip(getElementTextByTagNameNR(itemElement, "Buy_Price"));
-                // Give a buy now price of NULL if not supplied.
-                if (buy_price.isEmpty())
-                    buy_price = "";
+            // Get current bidding information for the item
+            String currently = strip(getElementTextByTagNameNR(itemElement, "Currently"));
+            String buy_price = strip(getElementTextByTagNameNR(itemElement, "Buy_Price"));
+            // Give a buy now price of NULL if not supplied.
+            if (buy_price.isEmpty())
+                buy_price = "";
 
-                String first_bid = strip(getElementTextByTagNameNR(itemElement, "First_Bid"));
-                String number_of_bids = getElementTextByTagNameNR(itemElement, "Number_of_Bids");
-                
-                // Get information about Categories that will go in categoryMap
-                Element[] categories = getElementsByTagNameNR(itemElement, "Category");
-                
+            String first_bid = strip(getElementTextByTagNameNR(itemElement, "First_Bid"));
+            String number_of_bids = getElementTextByTagNameNR(itemElement, "Number_of_Bids");
+            
+            // Get information about Categories that will go in categoryMap
+            Element[] categories = getElementsByTagNameNR(itemElement, "Category");
+            
             // Iterate through categories and add to categoryMap if necessary
-                int categoryCount = categories.length;
-                for (int ind = 0; ind < categoryCount; ind++) 
+            int categoryCount = categories.length;
+            for (int ind = 0; ind < categoryCount; ind++) 
+            {
+
+                String categoryName = getElementText(categories[ind]);
+                int categoryID;
+
+                // Create Category object and add to map if it doesn't exist
+                if (categoryMap.containsKey(categoryName)) 
                 {
-
-                    String categoryName = getElementText(categories[ind]);
-                    int categoryID;
-
-                    // Create Category object and add to map if it doesn't exist
-                    if (categoryMap.containsKey(categoryName)) 
-                    {
-                        // Category is already registered - get the categoryID from the map.
-                        Category category_object = categoryMap.get(categoryName);
-                        categoryID = category_object.c_categoryID;
-                     } 
-                     else 
-                     {
-                    // Create our own categoryID
-                    categoryID = categoryMap.size() + 1;
-                    Category category_object = new Category(categoryID, categoryName);
-                    categoryMap.put(categoryName, category_object);
-                     }
-
-                    // Add the relation to the itemscategoriesMap
-                    ItemCategory item_cat = new ItemCategory(itemID, categoryID);
-                    itemcategoriesMap.put(itemID + categoryID, item_cat);
+                    // Category is already registered - get the categoryID from the map.
+                    Category category_object = categoryMap.get(categoryName);
+                    categoryID = category_object.c_categoryID;
+                 } 
+                 else 
+                 {
+                // Create our own categoryID
+                categoryID = categoryMap.size() + 1;
+                Category category_object = new Category(categoryID, categoryName);
+                categoryMap.put(categoryName, category_object);
                 }
 
+            }
+
             // Get the list of bids
-                    Element BidsParent = getElementByTagNameNR(itemElement, "Bids");
-                    Element[] Bids = getElementsByTagNameNR(BidsParent, "Bid");
+            Element BidsParent = getElementByTagNameNR(itemElement, "Bids");
+            Element[] Bids = getElementsByTagNameNR(BidsParent, "Bid");
 
             // Iterate through the bids and add bidder and bid to respective maps if necessary
             int bidCount = Bids.length;
@@ -398,11 +296,7 @@ public class ItemServlet extends HttpServlet implements Servlet {
                 bidMap.put(b_userid + b_time, bid_object);
                 bidstring = b_userid + " " + b_time + " " + b_amount;
                 bidset.add(bidstring);
-                // Add the bidder to the userMap if not present
-                if (!userMap.containsKey(b_userid)) {
-                    User bidder_object = new User(b_userid, b_rating, b_location, b_country);
-                    userMap.put(b_userid, bidder_object);
-                }
+
             }
 
             // Get the seller information that will go in userMap
@@ -412,51 +306,41 @@ public class ItemServlet extends HttpServlet implements Servlet {
             String s_rating = seller.getAttribute("Rating");
             String s_location = getElementTextByTagNameNR(itemElement, "Location");
             String s_country = getElementTextByTagNameNR(itemElement, "Country");
-          
-            // Add the user to the userMap if not presentely identifies a user, who can be a bidder or a seller at different times. I think that means a user has one single ID, as opposed to having a pair. I may be wrong but both the seller and the bidder have location and country as subelements. I think t
-            if (!userMap.containsKey(s_userid)) {
-                User seller_object = new User(s_userid, s_rating, s_location, s_country);
-                userMap.put(s_userid, seller_object);
-            }
+      
+            // Create a user object to pass
+            User seller_object = new User(s_userid, s_rating, s_location, s_country);
 
-            // FINALLY Add the item to the itemMap
+            // Create an Item object to pass
             Item item_object = new Item(itemID, name, description, start_time, end_time, currently, first_bid, buy_price, number_of_bids, s_userid);
-            itemMap.put(itemID, item_object);
+
+            SortedSet catSet = new TreeSet(); 
+            for (String key : categoryMap.keySet()) {
+                catSet.add(key);
+            }   
+
+            /////////////////////////////////////////////////////////////////////////
+            ////////////////////Passing name for testing purposes///////////////////
+            ////////////////////Rest is TODO////////////////////////////////////////
+            /////////////////////Will be passing in objects/////////////////////////
+             
+            request.setAttribute("item", item_object);
+            request.setAttribute("seller", seller_object);
+            request.setAttribute("bids", bidset);
+            request.setAttribute("categories", catSet);            
+
+            // Send the data to the jsp page for display 
+            request.getRequestDispatcher("/itemResults.jsp").forward(request, response);
         
-
-                /////////////////////////////////////////////////////////////////////////
-                ////////////////////Passing name for testing purposes///////////////////
-                ////////////////////Rest is TODO////////////////////////////////////////
-                /////////////////////Will be passing in objects/////////////////////////
-                 
-                 request.setAttribute("name", name);
-                 request.setAttribute("userid", s_userid);
-                 request.setAttribute("location", s_location);
-                 request.setAttribute("first_bid", first_bid);
-                 request.setAttribute("description", description);
-                 request.setAttribute("rating", s_rating);
-                 request.setAttribute("start_time", start_time);
-                 request.setAttribute("end_time", end_time);
-                 request.setAttribute("bids",bidset);
-                 SortedSet set = new TreeSet(); 
-                 for (String key : categoryMap.keySet()) {
-                        set.add(key);
-                    }   
-                 request.setAttribute("categories", set);
-
-
-                     request.getRequestDispatcher("/itemResults.jsp").forward(request, response);
-            } catch (ParserConfigurationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } catch (SAXException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } finally {}
+        } catch (ParserConfigurationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        } catch (SAXException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        } finally {}
     }
     
-    /* Non-recursive (NR) version of Node.getElementsByTagName(...)
-*/
+    /* Non-recursive (NR) version of Node.getElementsByTagName(...) */
  
 }
 
