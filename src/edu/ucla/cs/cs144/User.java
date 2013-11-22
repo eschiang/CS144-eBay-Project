@@ -16,4 +16,12 @@ public class User {
         u_location = location;
         u_country = country;
     }
+   public String getLocation()
+    {
+        return u_location;
+    }
+   public String getCountry()
+    {
+        return u_country;
+    }
 }
