@@ -1,17 +1,24 @@
+<!DOCTYPE html>
 <html>
-        <head>
-        <style type="text/css">
-        </style>
-        </head>
-        
-        <body>
-	        <form action="./search" method="GET">
-	         Search:  <input name="q" type="text"/>
-	                  <input name="numResultsToSkip" type="hidden" value="0" />
-	                  <input name="numResultsToReturn" type="hidden" value="10" />
-	        </form>
-        </body>
-
+    <head>
+        <link rel="stylesheet" type="text/css" href="main.css">
+        <script src="suggest.js"></script>
+        <script type="text/javascript">
+            window.onload = function() {
+                var field = document.getElementById("keyword-search");
+                var suggest = new SuggestCtrl(field);
+            }
+        </script>
+    </head>
+    
+    <body>
+        <form action="./search" method="GET">
+            <label for="q">Search: </label><br>
+            <input id="keyword-search" name="q" type="text"/>
+            <input name="numResultsToSkip" type="hidden" value="0" />
+            <input name="numResultsToReturn" type="hidden" value="10" />
+        </form>
+    </body>
 </html>     
 
 

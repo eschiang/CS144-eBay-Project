@@ -1,0 +1,12 @@
+/* main.css */
+
+div.suggestions {
+	cursor: default;
+	padding: 0px 3px;
+	border: 1px solid black;
+}
+
+div.suggestions > .current {
+	background-color: #3366cc;
+    color: white;
+}
