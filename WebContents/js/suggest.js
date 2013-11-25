@@ -14,7 +14,7 @@ function SuggestCtrl(searchBar) {
 SuggestCtrl.prototype.init = function () {
     oThis = this;
 
-    this.searchBar.onkeydown = function(e) {
+    this.searchBar.onkeyup = function(e) {
         switch(e.keyCode) {
             case 38: //up arrow
                 oThis.previousSuggestion();
@@ -51,8 +51,10 @@ SuggestCtrl.prototype.fetchSuggestions = function () {
     // Get the text currently in the text field and format
     var text = escape(this.searchBar.value);
 
-    if (text == "")
+    if (text == "") {
+        this.hideSuggestions();
         return;
+    }
 
     // Fetch the results via the proxy server
     var request = new XMLHttpRequest();
@@ -69,7 +71,7 @@ SuggestCtrl.prototype.fetchSuggestions = function () {
                 oThis.hideSuggestions();
         }
     }
-    var url = "http://localhost:8080/eBay/suggest?q=" + text;
+    var url = "/eBay/suggest?q=" + text;
     request.open("GET", url, true);
     request.send();
 };
@@ -83,14 +85,19 @@ SuggestCtrl.prototype.fetchSuggestions = function () {
 SuggestCtrl.prototype.parseSuggestions = function (response) {
     var suggestions = Array();
 
+    if (typeof response === "undefined") 
+        return [];
+
     var completeSuggestions = response.documentElement.childNodes;
 
-    // Iterage over the suggestons and build an array to return
+    // Iterate over the suggestons and build an array to return
     for(var i = 0; i < completeSuggestions.length; i++) {
         suggestions[i] = completeSuggestions[i].childNodes[0].getAttribute("data"); 
     }
 
+
     return suggestions;
+
 };
 
 
