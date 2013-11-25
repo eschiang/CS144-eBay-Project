@@ -14,7 +14,7 @@ public class SearchServlet extends HttpServlet implements Servlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         // Get the query and numResults etc
-        String query = request.getParameter("q");
+         String query = request.getParameter("q");
 
         String numResultsToSkip = request.getParameter("numResultsToSkip");
 
@@ -24,9 +24,21 @@ public class SearchServlet extends HttpServlet implements Servlet {
         AuctionSearchClient searchClient = new AuctionSearchClient();
 
         SearchResult[] results = searchClient.basicSearch(query, Integer.parseInt(numResultsToSkip), Integer.parseInt(numResultsToReturn));
+      
+
 
         request.setAttribute("results", results);
-        request.setAttribute("numResults", Integer.parseInt(numResultsToReturn));
+        request.setAttribute("numResultsToSkip", Integer.parseInt(numResultsToSkip));
+        request.setAttribute("query", query);
+
+        request.setAttribute("numResultsToReturn", Integer.parseInt(numResultsToReturn));
         request.getRequestDispatcher("/searchResults.jsp").forward(request, response);
+
+        
+
+
+
+
+
     }
 }
