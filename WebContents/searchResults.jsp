@@ -11,13 +11,35 @@
 		      	 <input name="numResultsToReturn" type="hidden" value="10" />
 		</form>
 		<ul>
+		<%
+		 int numSkip = Integer.parseInt(request.getAttribute("numResultsToSkip").toString());
+        int numReturn = Integer.parseInt(request.getAttribute("numResultsToReturn").toString());
+        String query = (String) request.getAttribute("query");
+  		if (numSkip > 0)
+        {
+                %> <a href="/eBay/search?q=<%= query %>&numResultsToSkip=<%= numSkip-10 %>&numResultsToReturn=10">Previous Page</a>
+                <%
+        }
+        
+        SearchResult[] results = (SearchResult[]) request.getAttribute("results");
+        
+        if (results.length - 10 >= 0)
+        {
+                %> <a href="/eBay/search?q=<%= query %>&numResultsToSkip=<%= numSkip+10 %>&numResultsToReturn=10">Next Page</a>
+                <%
+        }
+        %>
+		
 
-		<% SearchResult[] results = (SearchResult[]) request.getAttribute("results");
-			Integer numResults = (Integer) request.getAttribute("numResults");
-			for(int i = 0; i < numResults; i++) { %>
+
+		<% 
+				
+			for(int i = 0; i < results.length; i++) { %>
 			<li><a href="/eBay/item?id=<%= results[i].getItemId()%>"><%= results[i].getName() %></a></li>
 
 			<% } %>
 		</ul>
+
+
 	</body>
 </html>
