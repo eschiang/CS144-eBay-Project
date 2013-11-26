@@ -51,7 +51,7 @@ SuggestCtrl.prototype.init = function () {
 SuggestCtrl.prototype.fetchSuggestions = function () { 
     // Get the text currently in the text field and format
     var text = escape(this.searchBar.value);
-    console.log(text);
+
     if (text == "") {
         this.hideSuggestions();
         return;

@@ -31,7 +31,7 @@
               <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="container collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li <a href="./keywordSearch.html">KeyWord Search</a></li>
+                    <li <a href="./keywordSearch.html">Keyword Search</a></li>
                     <li ><a href="./getItem.html">Get Item</a></li>
 
                 </ul>
@@ -45,10 +45,7 @@
                     <h2 class="text-center">eBay Search Web Site<h2>
                     <div class="col-lg-6 col-lg-offset-3">
                         <form class="form-inline" role="form" action="./search" method="GET">
-                            <div class="form-group">
-                                <input class="form-control" id="keyword-search" name="q" type="text"/>  
-                            </div>     
-                            <select class="form-control" name="numResultsToSkip" >
+                        	<select class="form-control" name="numResultsToSkip" >
                                 <option value="0">0</option>
                                 <option value="10">10</option>
                              </select>
@@ -56,6 +53,9 @@
                                 <option value="10">10</option>
                                 <option value="20">20</option>
                             </select>
+                        	 <div class="form-group">
+                                <input class="form-control" id="keyword-search" name="q" type="text"/>  
+                            </div>  
                             <button type="submit" class="btn btn-lg btn-primary">Search</button>
                             <div id="search-container">
                             </div>

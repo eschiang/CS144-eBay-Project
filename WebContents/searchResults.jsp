@@ -10,17 +10,25 @@
         <link rel="stylesheet" type="text/css" href="./css/main.css">
         <script src="./js/jquery1-10-1.js"></script>
         <script src="./js/bootstrap.min.js"></script>
+        <script src="./js/suggest.js"></script>
+        <script type="text/javascript">
+            window.onload = function() {
+                var field = document.getElementById("keyword-search");
+                var box = document.getElementById("search-container");
+                var suggest = new SuggestCtrl(field, box);
+            }
+        </script>
 	   <style type="text/css">
-.custom {
-    width: 478px !important;
-}
-form { 
-margin: 0 auto; 
-width:250px;
-}
-#leftbutton { float: left; }
-#rightbutton { float: right; }
-</style>
+		.custom {
+		    width: 478px !important;
+		}
+		form { 
+		margin: 0 auto; 
+		width:250px;
+		}
+		#leftbutton { float: left; }
+		#rightbutton { float: right; }
+		</style>
 	</head>
 
 	<body>
@@ -43,17 +51,24 @@ width:250px;
                     <li class="active"><a href="./keywordSearch.html">KeyWord Search</a></li>
                     <li><a href="./getItem.html">Get Item</a></li>
                 </ul>
-                <form class="navbar-form navbar-left" action="./search" method="GET" role="search">
-                    <div class="form-group">
-                        <input class="form-control" type="text" name="q">
-                        <input class="form-control" name="numResultsToSkip" type="hidden" value="0">
-                        <input class="form-control" name="numResultsToReturn" type="hidden" value="10">
-
-                    </div>
-                    <button type="submit" class="btn btn-default">Search Item</button>
-                </form>
+                
             </div><!-- /.navbar-collapse -->
         </nav>
+        <div class="row">
+        	<div class="col-lg-6 col-lg-offset-3">
+		        <form class="navbar-form navbar-left"  action="./search" method="GET" role="search">
+		            <div class="form-group">
+		                <input id="keyword-search" class="form-control" type="text" name="q">
+		                <input class="form-control" name="numResultsToSkip" type="hidden" value="0">
+		                <input class="form-control" name="numResultsToReturn" type="hidden" value="10">
+
+		            </div>
+		            <button type="submit" class="btn btn-default">Search Item</button>
+		            <div id="search-container"></div>
+		        </form>
+		    </div>
+	    </div>
+        
 		<!--<form action="./search" method="GET">
 		Search:  <input name="q" type="text"/>
 		      	 <input name="numResultsToSkip" type="hidden" value="0" />
