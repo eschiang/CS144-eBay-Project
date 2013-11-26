@@ -50,10 +50,6 @@ public class ItemServlet extends HttpServlet implements Servlet {
        
     public ItemServlet() {}
 
-    String bidstring;
-    SortedSet bidset = new TreeSet(); 
-
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////Our Code from Mypareser.java///////////////////////////////////////////////////////
@@ -271,6 +267,8 @@ public class ItemServlet extends HttpServlet implements Servlet {
             Element BidsParent = getElementByTagNameNR(itemElement, "Bids");
             Element[] Bids = getElementsByTagNameNR(BidsParent, "Bid");
 
+            Vector<Bid> bids = new Vector<Bid>(); 
+
             // Iterate through the bids and add bidder and bid to respective maps if necessary
             int bidCount = Bids.length;
             for (int j=0; j<bidCount; j++) {
@@ -293,9 +291,7 @@ public class ItemServlet extends HttpServlet implements Servlet {
 
                 // Add the bid to the bidMap
                 Bid bid_object = new Bid(b_userid, b_time, itemID, b_amount);
-                bidMap.put(b_userid + b_time, bid_object);
-                bidstring = b_userid + " " + b_time + " " + b_amount;
-                bidset.add(bidstring);
+                bids.add(bid_object);
 
             }
 
@@ -325,7 +321,7 @@ public class ItemServlet extends HttpServlet implements Servlet {
              
             request.setAttribute("item", item_object);
             request.setAttribute("seller", seller_object);
-            request.setAttribute("bids", bidset);
+            request.setAttribute("bids", bids);
             request.setAttribute("categories", catSet);            
 
             // Send the data to the jsp page for display 

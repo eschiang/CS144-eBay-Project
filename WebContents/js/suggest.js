@@ -1,9 +1,10 @@
 // suggest.js
 
-function SuggestCtrl(searchBar) {
+function SuggestCtrl(searchBar, searchContainer) {
     this.cur = -1;
     this.layer = null;
     this.searchBar = searchBar;
+    this.searchContainer = searchContainer;
     this.init();
 }
 
@@ -50,7 +51,7 @@ SuggestCtrl.prototype.init = function () {
 SuggestCtrl.prototype.fetchSuggestions = function () { 
     // Get the text currently in the text field and format
     var text = escape(this.searchBar.value);
-
+    console.log(text);
     if (text == "") {
         this.hideSuggestions();
         return;
@@ -130,7 +131,7 @@ SuggestCtrl.prototype.buildSuggestBox = function (suggestions) {
     this.layer.className = "suggestions";
     this.layer.style.visibility = "hidden";
     this.layer.style.width = this.searchBar.offsetWidth + "px";
-    document.body.appendChild(this.layer);
+    this.searchContainer.appendChild(this.layer);
 
     var oThis = this;
 

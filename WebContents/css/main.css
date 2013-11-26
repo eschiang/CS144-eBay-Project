@@ -4,6 +4,8 @@ div.suggestions {
 	cursor: default;
 	padding: 0px 3px;
 	border: 1px solid black;
+	background-color: #ffffff;
+	font-size: medium;
 }
 
 div.suggestions > .current {

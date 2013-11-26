@@ -6,10 +6,10 @@ package edu.ucla.cs.cs144;
  */
 public class Bid
 {
-    String b_userid;
-    String b_time;
-    String b_item;
-    String b_amount;
+    public String b_userid;
+    public String b_time;
+    public String b_item;
+    public String b_amount;
 
     Bid(String userID, String time, String itemID, String amount)
     {

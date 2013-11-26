@@ -5,13 +5,19 @@
     User seller = (User) request.getAttribute("seller");
     SortedSet catSet =  (SortedSet) request.getAttribute("categories");
     Iterator categories = catSet.iterator();
-    SortedSet bidSet =  (SortedSet) request.getAttribute("bids");
-    Iterator bids = bidSet.iterator();
+    Vector<Bid> bidVec =  (Vector) request.getAttribute("bids");
+    Iterator bids = bidVec.iterator();
 %>
 <!DOCTYPE html>
 <html>
     <head>
-    <title><%= item.i_name %></title>
+        <title><%= item.i_name %></title>
+        <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="./css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="./css/main.css">
+        <script src="./js/jquery1-10-1.js"></script>
+        <script src="./js/bootstrap.min.js"></script>
+        <script src="./js/suggest.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
         <script type="text/javascript">
             var geocoder;
@@ -58,46 +64,132 @@
     </head>
 
     <body onload="initialize()">
-        <div class="container">
-            <form action="./item" method="GET">
-                Item ID <input type="text" name="id">
-                <input type="submit" value="Get Item">
-            </form>
-            <br/>
-            <h1><%= item.i_name %></h1>
-            
-            <div id="map_canvas" style="width: 50%; height: 400px"></div>
-            
-            <br/>
-            <hr>
+        <nav class="navbar navbar-default" role="navigation">
+          <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">eBay</a>
+            </div>
 
-            <h4>Tags</h4>
-            <ul>
-                <% while (categories.hasNext()) { %>
-                    <li><%= categories.next().toString() %></li>
+              <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="container collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="./keywordSearch.html">Auction Search</a></li>
+                    <li><a href="#">Item ID Search:</a></li>
+                </ul>
+                <form class="navbar-form navbar-left" action="./item" method="GET" role="search">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="id">
+                    </div>
+                    <button type="submit" class="btn btn-default">Get Item</button>
+                </form>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+
+        <div class="row">
+            <div class="col-lg-10 col-lg-offset-1">
+                <div class="page-header">
+                    <h1><%= item.i_name %></h1>
+                    <ul class="list-inline">
+                        <% while (categories.hasNext()) { %>
+                            <li><span class="label label-default"><%= categories.next().toString() %></span></li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-10 col-lg-offset-1">
+                <div class="col-lg-7">  
+                    <div class="col-lg-4">
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Auction Info</div>
+                                <div class="panel-body">
+                                    <dl>
+                                        <dt>Current Price</dt>
+                                            <dd>$<%= item.i_currently %></dt>
+                                        <dt>Number of Bids</dt>
+                                                <dd><%= item.i_numberofbids %></dt>
+                                        <% if(item.i_buyprice.length() != 0) { %>
+                                            <dt>Buy Now</dt>
+                                                <dd>$<%= item.i_buyprice %></dt>
+                                        <% } %>
+                                        <dt>First Bid</dt>
+                                            <dd>$<%= item.i_firstbid %></dt>
+                                        <dt>Start Date</dt>
+                                            <dd><%= item.i_started %></dt>
+                                        <dt>End Date</dt>
+                                            <dd><%= item.i_ends %></dt>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Seller Info</div>
+                                <div class="panel-body">
+                                    <dl>
+                                        <dt>Seller</dt>
+                                        <dd><%= seller.u_name %></dd>
+                                        <dt>Rating</dt>
+                                        <dd><%= seller.u_rating %></dd>
+                                        <dt>Location</dt>
+                                        <dd><%= seller.u_location + ", " + seller.u_country %></dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <p><%= item.i_description %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div id="map_canvas" style="width: 100%; height: 400px"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6 col-lg-offset-3">
+                <h3>Bidding History</h3>
+                <% if (bids.hasNext()) { %>
+                    <table class="table">
+                        <tr>
+                            <th>#</th>
+                            <th>Bidder</th>
+                            <th>Time</th>
+                            <th>Amount</th>
+                        </tr>
+
+                        <% int i=0;
+                           while (bids.hasNext()) { 
+                                Bid current = (Bid) bids.next();
+                                i++; %>
+                                <tr><td><%= i %></td><td><%= current.b_userid %></td><td><%= current.b_time %></td><td><%= "$" + current.b_amount %></td></tr>
+                        <% } %> 
+                    </table>
+                <% } else { %>
+                    <div class="col-lg-12">
+                        <div class="alert alert-info">
+                            <p class="text-center">No bids to display</p>
+                        </div>
+                    </div>
                 <% } %>
-            </ul>
-
-            <h4>Item Info</h4>
-            <ul>
-                <li>Description: <%= item.i_description %></li>
-                <li>Seller: <%= seller.u_name %></li>
-                <li>Seller Rating: <%= seller.u_rating %></li>
-                <li>Seller Location: <%= seller.u_location + ", " + seller.u_country %></li>
-                <li>Currently: $<%= item.i_currently %></li>
-                <li>Buy Now: $<%= item.i_buyprice %></li>
-                <li>Number of Bids: <%= item.i_numberofbids %></li>
-                <li>First: <%= item.i_firstbid %></li>
-                <li>Started: <%= item.i_started %></li>
-                <li>Ends: <%= item.i_ends %></li>
-            </ul>
-
-            <h4>Bidding History</h4>
-            <ul>
-            <% while (bids.hasNext()) { %>
-                <li><%= bids.next().toString() %></li>
-            <% } %> 
-            </ul>
+            </div>
         </div>
     </body>
 </html>
