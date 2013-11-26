@@ -18,6 +18,8 @@ form {
 margin: 0 auto; 
 width:250px;
 }
+#leftbutton { float: left; }
+#rightbutton { float: right; }
 </style>
 	</head>
 
@@ -59,7 +61,7 @@ width:250px;
 		</form>
 		-->
 		<div class="row">
-            <div class="col-lg-10 col-lg-offset-1">
+            <div class="col-lg-8 col-lg-offset-2">
 		<div class="page-header">
   <h1>SEARCH RESULTS</h1>
 </div>
@@ -92,16 +94,32 @@ width:250px;
         %>
 		
 
-
+<br>
 		<% 
 				
 			for(int i = 0; i < results.length; i++) { %>
 			<!--<li><a href="/eBay/item?id=<%= results[i].getItemId()%>"><%= results[i].getName() %></a></li>-->
-      <BR>&nbsp;<BR>
+      		<% if(i%2==0 || i==0)
+      		{
 
-			<button class="btn btn-large btn-info custom	" type="button" value="Page" onclick="location.href='/eBay/item?id=<%= results[i].getItemId()%>';"><%= results[i].getName() %></button>
+      		%>
+			<button class="btn btn-large btn-info custom" id='leftbutton' type="button" value="Page" onclick="location.href='/eBay/item?id=<%= results[i].getItemId()%>';"><%= results[i].getName() %></button>
 			
-			<% } %>
+			<%
+			} 
+			else 
+			{ %>
+
+			
+			
+			<button class="btn btn-large btn-info custom" id='rightbutton' type="button" value="Page" onclick="location.href='/eBay/item?id=<%= results[i].getItemId()%>';"><%= results[i].getName() %></button>
+			<br>
+			<br>
+			<% 
+			}%>
+
+			<%
+			} %>
 		</ul>
 		</div>
 		</div>
