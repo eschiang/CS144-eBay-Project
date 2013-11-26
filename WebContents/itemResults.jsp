@@ -79,14 +79,14 @@
               <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="container collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a href="./keywordSearch.html">Auction Search</a></li>
-                    <li><a href="#">Item ID Search:</a></li>
+                    <li><a href="./keywordSearch.html">Keyword Search</a></li>
+                    <li><a href="./getItem.html">Get Item</a></li>
                 </ul>
                 <form class="navbar-form navbar-left" action="./item" method="GET" role="search">
                     <div class="form-group">
                         <input class="form-control" type="text" name="id">
                     </div>
-                    <button type="submit" class="btn btn-default">Get Item</button>
+                    <button type="submit" class="btn btn-default">Go</button>
                 </form>
             </div><!-- /.navbar-collapse -->
         </nav>

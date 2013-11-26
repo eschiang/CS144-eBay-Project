@@ -3,6 +3,7 @@ package edu.ucla.cs.cs144;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URI;
 import java.io.InputStream;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -16,10 +17,11 @@ public class ProxyServlet extends HttpServlet implements Servlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Handle the request and pick out the query
-        String query = request.getParameter("q");
+        String query = request.getQueryString();
 
         // Issue the GET request to google suggest
-        URL googleUrl = new URL("http://google.com/complete/search?output=toolbar&q="+query);
+        //String url = URLEncoder.encode("http://google.com/complete/search?output=toolbar&q="+query);
+        URL googleUrl = new URL("http://google.com/complete/search?output=toolbar&"+query);
         HttpURLConnection googleRequest = (HttpURLConnection) googleUrl.openConnection();
 
         if (googleRequest.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -35,7 +37,7 @@ public class ProxyServlet extends HttpServlet implements Servlet {
             {
                 response.getOutputStream().write(buffer, 0, bytesRead);
             }
-
+            
             // Close the output
             response.getOutputStream().flush();
             response.getOutputStream().close();
