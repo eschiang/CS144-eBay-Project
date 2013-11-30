@@ -1,17 +1,30 @@
 package edu.ucla.cs.cs144;
 
+import java.io.IOException;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
+
+import edu.ucla.cs.cs144.*;
 
 public class PaymentServlet extends HttpServlet implements Servlet {
-    
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException
-    {
-        // TODO: send user to the payment jsp page to enter CC info.
-        // Take info from session and put it on the page.
-        
-    }
+	public PaymentServlet() 
+	{}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession(true);
+		if (session.isNew()==true) 
+		{
+			request.setAttribute("valid", "false");
+			session.invalidate();
+			//Bad session
+		}
+		else {
+			//Good session, pass item along to purchase
+			request.setAttribute("valid", "true");
+			Item item = (Item) session.getAttribute("item");
+			request.setAttribute("item", item);
+		}
+		request.getRequestDispatcher("./purchase.jsp").forward(request, response);
+	}
 }
