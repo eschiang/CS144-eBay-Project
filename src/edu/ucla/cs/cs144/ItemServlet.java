@@ -31,6 +31,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
 import java.lang.Object;
 import javax.servlet.Servlet;
+import javax.servlet.http.HttpSession;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -318,7 +319,12 @@ public class ItemServlet extends HttpServlet implements Servlet {
             ////////////////////Passing name for testing purposes///////////////////
             ////////////////////Rest is TODO////////////////////////////////////////
             /////////////////////Will be passing in objects/////////////////////////
-             
+
+            //For session
+
+             HttpSession session = request.getSession(true);
+                session.setAttribute("item", item_object);
+                
             request.setAttribute("item", item_object);
             request.setAttribute("seller", seller_object);
             request.setAttribute("bids", bids);
