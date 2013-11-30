@@ -118,8 +118,8 @@
                                         <dt>Number of Bids</dt>
                                                 <dd><%= item.i_numberofbids %></dt>
                                         <% if(item.i_buyprice.length() != 0) { %>
-                                            <dt>Buy Now</dt>
-                                                <dd>$<%= item.i_buyprice %></dt>
+                                            <dt>Buy Price</dt>
+                                                <dd>$<%= item.i_buyprice %> <a class="button btn-sm btn-primary pull-right" href="/payment">Buy Now</a></dt>
                                         <% } %>
                                         <dt>First Bid</dt>
                                             <dd>$<%= item.i_firstbid %></dt>
