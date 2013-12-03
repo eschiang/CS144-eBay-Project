@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--
 <html>
     <head>
         <title>eBay | Keyword Search</title>
@@ -19,7 +20,6 @@
     
     <body>
         <nav class="navbar navbar-default" role="navigation">
-          <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span>
@@ -30,13 +30,12 @@
                 <a class="navbar-brand" href="./index.html">eBay</a>
             </div>
 
-              <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="container collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="./keywordSearch.html">Keyword Search</a></li>
                     <li><a href="./getItem.html">Get Item</a></li>
                 </ul>
-            </div><!-- /.navbar-collapse -->
+            </div>
         </nav>
 
         <br>
@@ -63,7 +62,36 @@
             </div>
         </div>
     </body>
-</html>     
+</html> -->    
+
+<html>
+    <head>
+        <title>Auction Search</title>
+        <link rel="stylesheet" type="text/css" href="./css/main.css">
+        <script src="./js/suggest.js"></script>
+        <script type="text/javascript">
+            window.onload = function() {
+                var field = document.getElementById("keyword-search");
+                var box = document.getElementById("search-container");
+                var suggest = new SuggestCtrl(field, box);
+            }
+        </script>
+    </head>
+    <body>
+        <div class="wrapper">
+            <h2>Search Auctions<h2>
+            <form action="./search" method="GET">
+                <input id="keyword-search" name="q" type="text"/>    
+                <input name="numResultsToSkip" type="hidden" value="0" />
+                <input name="numResultsToReturn" type="hidden" value="10" />
+                <button type="submit" class="btn btn-lg btn-primary">Search</button>
+                <div id="search-container">
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
+
 
 
 

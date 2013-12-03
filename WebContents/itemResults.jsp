@@ -73,7 +73,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">eBay</a>
+                <a class="navbar-brand" href="./index.html">eBay</a>
             </div>
 
               <!-- Collect the nav links, forms, and other content for toggling -->
@@ -114,19 +114,19 @@
                                 <div class="panel-body">
                                     <dl>
                                         <dt>Current Price</dt>
-                                            <dd>$<%= item.i_currently %></dt>
+                                            <dd>$<%= item.i_currently %></dd>
                                         <dt>Number of Bids</dt>
-                                                <dd><%= item.i_numberofbids %></dt>
+                                                <dd><%= item.i_numberofbids %></dd>
                                         <% if(item.i_buyprice.length() != 0) { %>
                                             <dt>Buy Price</dt>
-                                                <dd>$<%= item.i_buyprice %> <a class="button btn-sm btn-primary pull-right" href="/payment">Buy Now</a></dt>
+                                                <dd>$<%= item.i_buyprice %> <a class="button btn-sm btn-primary pull-right" href="./payment">Buy Now</a></dd>
                                         <% } %>
                                         <dt>First Bid</dt>
-                                            <dd>$<%= item.i_firstbid %></dt>
+                                            <dd>$<%= item.i_firstbid %></dd>
                                         <dt>Start Date</dt>
-                                            <dd><%= item.i_started %></dt>
+                                            <dd><%= item.i_started %></dd>
                                         <dt>End Date</dt>
-                                            <dd><%= item.i_ends %></dt>
+                                            <dd><%= item.i_ends %></dd>
                                     </dl>
                                 </div>
                             </div>
