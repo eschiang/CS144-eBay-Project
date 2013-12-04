@@ -8,6 +8,7 @@ import javax.servlet.http.*;
 import edu.ucla.cs.cs144.*;
 
 public class PaymentServlet extends HttpServlet implements Servlet {
+	Item item;
 	public PaymentServlet() 
 	{}
 
@@ -15,16 +16,19 @@ public class PaymentServlet extends HttpServlet implements Servlet {
 		HttpSession session = request.getSession(true);
 		if (session.isNew()==true) 
 		{
+			//Bad session, set valid to false
 			request.setAttribute("valid", "false");
 			session.invalidate();
-			//Bad session
+			//invalidate the session if it is new
 		}
 		else {
-			//Good session, pass item along to purchase
+			//This means session is valid
 			request.setAttribute("valid", "true");
-			Item item = (Item) session.getAttribute("item");
+			//Pass true to the next page.
+			item = (Item) session.getAttribute("item");
 			request.setAttribute("item", item);
 		}
+		//sed control to the purchase.jsp page with the request and response attributes
 		request.getRequestDispatcher("./purchase.jsp").forward(request, response);
 	}
 }
