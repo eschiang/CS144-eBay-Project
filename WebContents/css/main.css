@@ -27,8 +27,10 @@ div.wrapper {
 
 @media only screen and (max-width: 320px) {
 	body {
-		width: 100%;
+		width: auto;
 		overflow-x: hidden;
+		padding-left: 2px;
+		padding-right: 2px;
 	}
 
 	div.wrapper {
@@ -37,6 +39,15 @@ div.wrapper {
 		text-align: center;
 		border: 1px solid black;
 		background-color: #eee;
-	}	
+	}
+
+	div.input-container {
+		margin-left: 15px;
+		margin-right: 15px;
+	}
+
+	div.input-container > input {
+		width: 100%;
+	}
 
 }
