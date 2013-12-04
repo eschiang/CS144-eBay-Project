@@ -73,6 +73,7 @@
                                         </div>
                                     </div>   
                                     <br>
+                                    <input type="hidden" name="purchaseid" value="<%= item.i_id %>" />
                                     <div class="col-lg-4 col-lg-offset-4">
                                         <button type="submit" class="btn btn-primary btn-block">Purchase</button>
                                     </div>  

@@ -323,7 +323,7 @@ public class ItemServlet extends HttpServlet implements Servlet {
             //For session
 
              HttpSession session = request.getSession(true);
-                session.setAttribute("item", item_object);
+                session.setAttribute(item_object.i_id, item_object);
                 
             request.setAttribute("item", item_object);
             request.setAttribute("seller", seller_object);

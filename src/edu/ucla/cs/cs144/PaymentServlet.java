@@ -20,15 +20,24 @@ public class PaymentServlet extends HttpServlet implements Servlet {
 			request.setAttribute("valid", "false");
 			session.invalidate();
 			//invalidate the session if it is new
+		} else {
+			String itemid = (String) request.getParameter("id");
+			if (itemid != null) {
+				//This means session is valid
+				request.setAttribute("valid", "true");
+
+				//Pass true to the next page.
+				item = (Item) session.getAttribute(itemid);
+				request.setAttribute("item", item);
+
+				session.setAttribute("itemid", item);
+			} else {
+				//This means request isn't valid
+				request.setAttribute("valid", "false");
+			}
+
 		}
-		else {
-			//This means session is valid
-			request.setAttribute("valid", "true");
-			//Pass true to the next page.
-			item = (Item) session.getAttribute("item");
-			request.setAttribute("item", item);
-		}
-		//sed control to the purchase.jsp page with the request and response attributes
+		// send control to the purchase.jsp page with the request and response attributes
 		request.getRequestDispatcher("./purchase.jsp").forward(request, response);
 	}
 }

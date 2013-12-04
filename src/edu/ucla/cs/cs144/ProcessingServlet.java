@@ -17,18 +17,31 @@ public class ProcessingServlet extends HttpServlet implements Servlet {
 			session.invalidate();
 			//Bad session
 		} else {
-			//Good session, complete purchase
-			request.setAttribute("valid", "true");
-			Item item = (Item) session.getAttribute("item");
-			request.setAttribute("item", item);
+			// Get the item ID from the hidden field
+			String itemid = (String) request.getParameter("purchaseid");
+			// Get the item's info from session
+			Item item = (Item) session.getAttribute(itemid);
 
-			// Get the credit card number from the POSTed form
-			String cardNumber = (String) request.getParameter("cardNumber");
-			request.setAttribute("cardNumber", cardNumber);
+			if (item != null) {
+				//Good session, complete purchase
+				request.setAttribute("valid", "true");
 
-			// Pass the time
-			Date date = new Date();
-			request.setAttribute("time", date.toString());
+				// Pass the item to the jsp and then remove it from session so it can't be processed again
+				request.setAttribute("item", item);
+				session.removeAttribute(itemid);
+
+				// Get the credit card number from the POSTed form
+				String cardNumber = (String) request.getParameter("cardNumber");
+				request.setAttribute("cardNumber", cardNumber);
+
+				// Pass the time
+				Date date = new Date();
+				request.setAttribute("time", date.toString());
+			} else {
+				// Purchase isn't set in session, so we have an error
+				request.setAttribute("valid", "false");
+			}
+
 		}
 
     	// Redirect to confirmation page
